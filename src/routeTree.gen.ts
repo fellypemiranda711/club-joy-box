@@ -25,6 +25,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin.assinaturas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminComissoesRouteImport } from './routes/_authenticated/admin.comissoes'
 import { Route as AuthenticatedAdminLaboratoriosRouteImport } from './routes/_authenticated/admin.laboratorios'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -110,6 +111,12 @@ const AuthenticatedAdminClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminComissoesRoute =
+  AuthenticatedAdminComissoesRouteImport.update({
+    id: '/comissoes',
+    path: '/comissoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminLaboratoriosRoute =
   AuthenticatedAdminLaboratoriosRouteImport.update({
     id: '/laboratorios',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -163,6 +171,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -185,6 +194,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/_authenticated/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/admin/assinaturas'
     | '/admin/clientes'
+    | '/admin/comissoes'
     | '/admin/laboratorios'
     | '/admin/pedidos'
     | '/admin/'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/admin/assinaturas'
     | '/admin/clientes'
+    | '/admin/comissoes'
     | '/admin/laboratorios'
     | '/admin/pedidos'
     | '/admin'
@@ -247,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/admin/assinaturas'
     | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/comissoes'
     | '/_authenticated/admin/laboratorios'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/'
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/comissoes': {
+      id: '/_authenticated/admin/comissoes'
+      path: '/comissoes'
+      fullPath: '/admin/comissoes'
+      preLoaderRoute: typeof AuthenticatedAdminComissoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/laboratorios': {
       id: '/_authenticated/admin/laboratorios'
       path: '/laboratorios'
@@ -406,6 +426,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminComissoesRoute: typeof AuthenticatedAdminComissoesRoute
   AuthenticatedAdminLaboratoriosRoute: typeof AuthenticatedAdminLaboratoriosRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -414,6 +435,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminComissoesRoute: AuthenticatedAdminComissoesRoute,
   AuthenticatedAdminLaboratoriosRoute: AuthenticatedAdminLaboratoriosRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
