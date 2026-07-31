@@ -219,12 +219,19 @@ function AdminPage() {
       <section className="mt-10">
         <h2 className="font-display text-lg font-semibold">Solicitações de orçamento</h2>
         <div className="mt-4 space-y-3">
-          {quotes.data?.map((q) => (
+          {quotes.data?.map((q) => {
+            const profile = profiles.data?.find((p) => p.id === q.user_id);
+            const phoneDigits = toE164Digits(profile?.phone);
+            return (
             <div key={q.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4 text-sm">
               <div>
                 <p className="font-medium">{q.patient_name}</p>
                 <p className="text-muted-foreground">
                   {q.lens_type || "—"} · {q.status} · {new Date(q.created_at).toLocaleDateString("pt-BR")}
+                </p>
+                <p className="text-muted-foreground">
+                  {profile?.full_name || "Associado"} ·{" "}
+                  {profile?.phone ? profile.phone : "sem WhatsApp cadastrado"}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -234,7 +241,12 @@ function AdminPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => {
+                  disabled={!phoneDigits || sendQuote.isPending}
+                  onClick={async () => {
+                    if (!phoneDigits) {
+                      toast.error("Este associado não tem WhatsApp cadastrado.");
+                      return;
+                    }
                     const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
                     if (!raw) return;
                     const cents = Math.round(Number(raw.replace(/\./g, "").replace(",", ".")) * 100);
@@ -242,17 +254,32 @@ function AdminPage() {
                       toast.error("Valor inválido.");
                       return;
                     }
-                    sendQuote.mutate({ id: q.id, amountCents: cents });
+                    const url = buildWhatsappUrl(
+                      phoneDigits,
+                      buildQuoteMessage({
+                        memberName: profile?.full_name ?? null,
+                        patientName: q.patient_name,
+                        lensType: q.lens_type,
+                        amountCents: cents,
+                      }),
+                    );
+                    const win = window.open(url, "_blank", "noopener,noreferrer");
+                    try {
+                      await sendQuote.mutateAsync({ id: q.id, amountCents: cents });
+                    } catch {
+                      win?.close();
+                    }
                   }}
                 >
-                  Enviar orçamento
+                  Enviar orçamento por WhatsApp
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
                   Concluir
                 </Button>
               </div>
             </div>
-          ))}
+            );
+          })}
           {quotes.data?.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma solicitação ainda.</p>}
         </div>
       </section>
