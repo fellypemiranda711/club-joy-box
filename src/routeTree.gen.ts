@@ -17,6 +17,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAreaRouteImport } from './routes/_authenticated/area'
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
@@ -60,6 +61,11 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAreaRoute = AuthenticatedAreaRouteImport.update({
   id: '/area',
   path: '/area',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/area': typeof AuthenticatedAreaRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/area': typeof AuthenticatedAreaRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/area': typeof AuthenticatedAreaRoute
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/planos'
     | '/sobre'
+    | '/admin'
     | '/area'
     | '/orcamentos'
     | '/perfil'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/planos'
     | '/sobre'
+    | '/admin'
     | '/area'
     | '/orcamentos'
     | '/perfil'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/planos'
     | '/sobre'
+    | '/_authenticated/admin'
     | '/_authenticated/area'
     | '/_authenticated/orcamentos'
     | '/_authenticated/perfil'
@@ -223,6 +235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/area': {
       id: '/_authenticated/area'
       path: '/area'
@@ -248,12 +267,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAreaRoute: typeof AuthenticatedAreaRoute
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAreaRoute: AuthenticatedAreaRoute,
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
