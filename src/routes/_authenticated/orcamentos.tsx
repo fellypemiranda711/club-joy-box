@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
+import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
