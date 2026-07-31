@@ -246,6 +246,58 @@ function AdminPage() {
       </section>
 
       <section className="mt-10">
+        <h2 className="font-display text-lg font-semibold">Medidas enviadas por foto</h2>
+        <div className="mt-4 space-y-3">
+          {measurements.data?.map((m) => (
+            <div key={m.id} className="rounded-xl border border-border p-4 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-medium">{m.quote_requests?.patient_name ?? "Associado"}</p>
+                <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+                  {measurementStatusLabels[m.status] ?? m.status}
+                </span>
+              </div>
+              <p className="mt-2 text-muted-foreground">
+                DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura{" "}
+                {m.height_right_mm}/{m.height_left_mm} mm
+                {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
+                  Ver foto frontal
+                </Button>
+                {m.profile_photo_path && (
+                  <Button size="sm" variant="outline" onClick={() => openPhoto(m.profile_photo_path)}>
+                    Ver foto de perfil
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  onClick={() => reviewMeasurement.mutate({ id: m.id, status: "validated" })}
+                >
+                  Conferir e aprovar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const notes = window.prompt("O que precisa ser refeito?") ?? undefined;
+                    reviewMeasurement.mutate({ id: m.id, status: "rejected", notes });
+                  }}
+                >
+                  Pedir para refazer
+                </Button>
+              </div>
+            </div>
+          ))}
+          {measurements.data?.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhuma medida enviada ainda.</p>
+          )}
+        </div>
+      </section>
+
+
+
+      <section className="mt-10">
         <h2 className="font-display text-lg font-semibold">Laboratórios parceiros</h2>
         <div className="mt-4 space-y-3">
           {labs.data?.map((l) => (
