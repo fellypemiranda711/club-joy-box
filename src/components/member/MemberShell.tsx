@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin, useSession } from "@/hooks/use-session";
 
 const items = [
   { to: "/area", label: "Painel" },
@@ -14,8 +13,6 @@ const items = [
 export function MemberNav() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useSession();
-  const { data: isAdmin } = useIsAdmin(user?.id);
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -37,16 +34,6 @@ export function MemberNav() {
           {item.label}
         </Link>
       ))}
-      {isAdmin && (
-        <Link
-          to="/admin"
-          activeProps={{ className: "bg-primary text-primary-foreground" }}
-          inactiveProps={{ className: "text-muted-foreground hover:bg-secondary" }}
-          className="rounded-full px-4 py-2 text-sm transition-colors"
-        >
-          Admin
-        </Link>
-      )}
       <button
         onClick={signOut}
         className="ml-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary"
