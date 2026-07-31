@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      lab_lens_products: {
+        Row: {
+          active: boolean
+          cost_cents: number
+          created_at: string
+          id: string
+          lab_id: string
+          lens_type: string | null
+          name: string
+          notes: string | null
+          price_cents: number
+          refraction_index: string | null
+          treatments: string[]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cost_cents?: number
+          created_at?: string
+          id?: string
+          lab_id: string
+          lens_type?: string | null
+          name: string
+          notes?: string | null
+          price_cents?: number
+          refraction_index?: string | null
+          treatments?: string[]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cost_cents?: number
+          created_at?: string
+          id?: string
+          lab_id?: string
+          lens_type?: string | null
+          name?: string
+          notes?: string | null
+          price_cents?: number
+          refraction_index?: string | null
+          treatments?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_lens_products_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labs: {
         Row: {
           active: boolean

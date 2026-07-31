@@ -9,6 +9,7 @@ const links = [
   { to: "/admin/assinaturas", label: "Assinaturas", exact: false },
   { to: "/admin/pedidos", label: "Pedidos", exact: false },
   { to: "/admin/laboratorios", label: "Laboratórios", exact: false },
+  { to: "/admin/lentes", label: "Tabela de lentes", exact: false },
   { to: "/admin/comissoes", label: "Comissões", exact: false },
   { to: "/admin/relatorios", label: "Relatórios", exact: false },
   { to: "/admin/financeiro", label: "Financeiro", exact: false },
