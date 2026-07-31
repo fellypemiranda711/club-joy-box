@@ -6,11 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { MemberShell } from "@/components/member/MemberShell";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
-import { planBySlug, planCatalog } from "@/lib/plan-catalog";
+import { isSubscriptionActive, planBySlug, planCatalog } from "@/lib/plan-catalog";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { createPortalSession } from "@/utils/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/area")({
+  validateSearch: (search: Record<string, unknown>): { checkout?: string | undefined } => ({
+    checkout: typeof search["checkout"] === "string" ? search["checkout"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Área do associado | Vision Club" },
@@ -35,6 +38,7 @@ const statusLabels: Record<string, string> = {
 
 function AreaPage() {
   const { user } = useSession();
+  const { checkout } = Route.useSearch();
 
 
   const profile = useQuery({
@@ -93,6 +97,7 @@ function AreaPage() {
   });
 
   const sub = subscription.data;
+  const checkoutPending = checkout === "success" && !isSubscriptionActive(sub);
   const hasBilling = Boolean(sub?.stripe_customer_id);
 
   return (
@@ -101,6 +106,14 @@ function AreaPage() {
         Olá{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""}!
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">Este é o seu painel Vision Club.</p>
+
+      {checkout === "success" && (
+        <div className="mt-6 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm">
+          {checkoutPending
+            ? "Pagamento recebido! Estamos confirmando com a operadora — sua carteirinha é liberada em instantes."
+            : "Assinatura confirmada! Sua carteirinha digital já está ativa."}
+        </div>
+      )}
 
       {!sub && !subscription.isLoading && (
         <div className="mt-8 rounded-2xl border border-border p-6">
