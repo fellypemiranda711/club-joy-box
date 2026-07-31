@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
@@ -44,6 +45,22 @@ function OrcamentosPage() {
   const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "" });
   const [file, setFile] = useState<File | null>(null);
 
+  const subscription = useQuery({
+    queryKey: ["subscription", user?.id],
+    enabled: Boolean(user?.id),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const list = useQuery({
     queryKey: ["quotes", user?.id],
     enabled: Boolean(user?.id),
@@ -59,6 +76,7 @@ function OrcamentosPage() {
 
   const create = useMutation({
     mutationFn: async () => {
+      if (!isActive) throw new Error("Ative sua assinatura para solicitar orçamentos.");
       const parsed = schema.safeParse(form);
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dados inválidos");
 
@@ -90,12 +108,52 @@ function OrcamentosPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const sub = subscription.data;
+  const isActive = isSubscriptionActive(sub);
+  const plan = planBySlug(sub?.plan_slug);
+  const pairsLimit = plan?.pairsPerYear ?? 0;
+
+  const cycleStart = sub?.current_period_start ?? sub?.started_at ?? null;
+  const usedThisCycle = (list.data ?? []).filter(
+    (q) =>
+      q.status !== "canceled" &&
+      (!cycleStart || new Date(q.created_at).getTime() >= new Date(cycleStart).getTime()),
+  ).length;
+  const overLimit = pairsLimit > 0 && usedThisCycle >= pairsLimit;
+
   return (
     <MemberShell>
       <h1 className="font-display text-3xl font-semibold tracking-tight">Solicitações de orçamento</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Envie sua receita e nossa equipe negocia as condições com os laboratórios parceiros.
       </p>
+
+      {!subscription.isLoading && !isActive && (
+        <div className="mt-6 rounded-2xl border border-border bg-secondary/50 p-6">
+          <p className="font-medium">Assinatura necessária</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            As solicitações de orçamento são exclusivas para associados com assinatura ativa.
+          </p>
+          <Button className="mt-4" asChild>
+            <Link to="/area">Ativar minha assinatura</Link>
+          </Button>
+        </div>
+      )}
+
+      {isActive && pairsLimit > 0 && (
+        <div className="mt-6 rounded-xl border border-border px-4 py-3 text-sm">
+          <span className="text-muted-foreground">Direitos do plano {plan?.name}: </span>
+          <span className="font-medium">
+            {Math.min(usedThisCycle, pairsLimit)} de {pairsLimit} {pairsLimit === 1 ? "par" : "pares"} usados neste ano de assinatura
+          </span>
+          {overLimit && (
+            <p className="mt-1 text-muted-foreground">
+              Você já usou todos os pares inclusos. Novas solicitações continuam permitidas, mas
+              podem não ter o preço de laboratório do clube.
+            </p>
+          )}
+        </div>
+      )}
 
       <form
         className="mt-8 grid gap-4 rounded-2xl border border-border p-6 md:grid-cols-2"
@@ -143,7 +201,7 @@ function OrcamentosPage() {
           />
         </div>
         <div className="md:col-span-2">
-          <Button type="submit" disabled={create.isPending}>
+          <Button type="submit" disabled={create.isPending || !isActive}>
             {create.isPending ? "Enviando..." : "Enviar solicitação"}
           </Button>
         </div>
