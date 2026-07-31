@@ -42,6 +42,13 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-graphite: var(--graphite);
+  --color-primary-soft: var(--primary-soft);
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
