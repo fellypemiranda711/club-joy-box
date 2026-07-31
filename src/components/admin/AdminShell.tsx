@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MemberShell } from "@/components/member/MemberShell";
 
-const links = [
+const links: { to: string; label: string; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", exact: true },
   { to: "/admin/clientes", label: "Clientes" },
   { to: "/admin/assinaturas", label: "Assinaturas" },
@@ -12,7 +12,7 @@ const links = [
   { to: "/admin/financeiro", label: "Financeiro" },
   { to: "/admin/suporte", label: "Suporte" },
   { to: "/admin/crm", label: "CRM" },
-] as const;
+];
 
 export function AdminNav() {
   return (
