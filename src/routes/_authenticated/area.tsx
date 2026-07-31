@@ -77,25 +77,23 @@ function AreaPage() {
     },
   });
 
-  const subscribe = useMutation({
-    mutationFn: async (slug: string) => {
-      const plan = planCatalog.find((p) => p.slug === slug)!;
-      const { error } = await supabase.from("subscriptions").insert({
-        user_id: user!.id,
-        plan_slug: plan.slug,
-        plan_name: plan.name,
-        monthly_price_cents: plan.monthlyPriceCents,
+  const openPortal = useMutation({
+    mutationFn: async () => {
+      const result = await createPortalSession({
+        data: {
+          returnUrl: `${window.location.origin}/area`,
+          environment: getStripeEnvironment(),
+        },
       });
-      if (error) throw error;
+      if ("error" in result) throw new Error(result.error);
+      return result.url;
     },
-    onSuccess: () => {
-      toast.success("Plano solicitado! Nossa equipe vai confirmar a ativação.");
-      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
-    },
-    onError: () => toast.error("Não foi possível registrar seu plano."),
+    onSuccess: (url) => window.open(url, "_blank", "noopener"),
+    onError: (e: Error) => toast.error(e.message || "Não foi possível abrir a gestão de assinatura."),
   });
 
   const sub = subscription.data;
+  const hasBilling = Boolean(sub?.stripe_customer_id);
 
   return (
     <MemberShell>
@@ -108,7 +106,8 @@ function AreaPage() {
         <div className="mt-8 rounded-2xl border border-border p-6">
           <h2 className="font-display text-lg font-semibold">Escolha seu plano</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Selecione um plano para gerar sua carteirinha digital.
+            Selecione um plano, finalize o pagamento e sua carteirinha digital é gerada
+            automaticamente.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {planCatalog.map((plan) => (
@@ -116,18 +115,16 @@ function AreaPage() {
                 <p className="font-medium">{plan.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.priceLabel}</p>
                 <p className="mt-2 text-xs text-muted-foreground">{plan.summary}</p>
-                <Button
-                  size="sm"
-                  className="mt-4 w-full"
-                  disabled={subscribe.isPending}
-                  onClick={() => subscribe.mutate(plan.slug)}
-                >
-                  Assinar
+                <Button size="sm" className="mt-4 w-full" asChild>
+                  <Link to="/assinar" search={{ plano: plan.slug }}>
+                    Assinar
+                  </Link>
                 </Button>
               </div>
             ))}
           </div>
         </div>
+
       )}
 
       {sub && (
