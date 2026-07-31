@@ -158,10 +158,32 @@ function AreaPage() {
             />
             <InfoRow
               icon={<CalendarClock className="h-4 w-4" />}
-              label="Início"
-              value={new Date(sub.started_at).toLocaleDateString("pt-BR")}
+              label={sub.current_period_end ? "Próxima cobrança" : "Início"}
+              value={new Date(sub.current_period_end ?? sub.started_at).toLocaleDateString("pt-BR")}
             />
+            {sub.cancel_at_period_end && (
+              <p className="text-xs text-muted-foreground">
+                Assinatura cancelada — acesso mantido até o fim do período pago.
+              </p>
+            )}
+            {hasBilling ? (
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={openPortal.isPending}
+                onClick={() => openPortal.mutate()}
+              >
+                Gerenciar assinatura e pagamentos
+              </Button>
+            ) : (
+              <Button className="w-full" asChild>
+                <Link to="/assinar" search={{ plano: sub.plan_slug }}>
+                  Concluir pagamento
+                </Link>
+              </Button>
+            )}
           </div>
+
         </div>
       )}
 
