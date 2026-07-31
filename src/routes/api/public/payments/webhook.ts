@@ -6,6 +6,9 @@ const PLAN_BY_PRICE: Record<string, { slug: string; name: string; cents: number 
   plano_essencial_mensal: { slug: "essencial", name: "Essencial", cents: 1990 },
   plano_cuidado_mais_mensal: { slug: "cuidado-mais", name: "Cuidado+", cents: 3990 },
   plano_familia_mensal: { slug: "familia", name: "Família", cents: 8990 },
+  plano_essencial_anual: { slug: "essencial", name: "Essencial", cents: 1990 },
+  plano_cuidado_mais_anual: { slug: "cuidado-mais", name: "Cuidado+", cents: 3990 },
+  plano_familia_anual: { slug: "familia", name: "Família", cents: 8990 },
 };
 
 let _supabase: any = null;
