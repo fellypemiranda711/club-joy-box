@@ -191,6 +191,23 @@ function OrcamentosPage() {
           />
         </div>
         <div className="space-y-2 md:col-span-2">
+          <Label>Você já possui a armação?</Label>
+          <RadioGroup
+            className="flex gap-6 pt-1"
+            value={form.has_frame}
+            onValueChange={(v) => setForm((f) => ({ ...f, has_frame: v }))}
+          >
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="sim" id="frame-sim" />
+              <Label htmlFor="frame-sim" className="font-normal">Sim, já tenho</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="nao" id="frame-nao" />
+              <Label htmlFor="frame-nao" className="font-normal">Não, preciso de uma</Label>
+            </div>
+          </RadioGroup>
+        </div>
+        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="prescription">Receita (PDF ou imagem, até 5 MB)</Label>
           <Input
             id="prescription"
