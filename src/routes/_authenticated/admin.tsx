@@ -215,9 +215,25 @@ function AdminPage() {
                   {q.lens_type || "—"} · {q.status} · {new Date(q.created_at).toLocaleDateString("pt-BR")}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
                   Em cotação
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
+                    if (!raw) return;
+                    const cents = Math.round(Number(raw.replace(/\./g, "").replace(",", ".")) * 100);
+                    if (!Number.isFinite(cents) || cents <= 0) {
+                      toast.error("Valor inválido.");
+                      return;
+                    }
+                    sendQuote.mutate({ id: q.id, amountCents: cents });
+                  }}
+                >
+                  Enviar orçamento
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
                   Concluir
