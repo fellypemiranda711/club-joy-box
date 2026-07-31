@@ -51,6 +51,16 @@ function AdminPage() {
     },
   });
 
+  const profiles = useQuery({
+    queryKey: ["admin-profiles"],
+    enabled: Boolean(isAdmin),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("id, full_name, phone");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const measurements = useQuery({
     queryKey: ["admin-measurements"],
     enabled: Boolean(isAdmin),
