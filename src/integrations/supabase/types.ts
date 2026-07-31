@@ -344,6 +344,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      respond_to_quote: {
+        Args: { _decision: string; _quote_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "member"
