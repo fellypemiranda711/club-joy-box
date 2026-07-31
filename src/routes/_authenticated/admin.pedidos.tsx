@@ -111,6 +111,10 @@ function PedidosPage() {
           const profile = profiles.data?.find((p) => p.id === q.user_id);
           const phoneDigits = toE164Digits(profile?.phone);
           const lab = labs.data?.find((l) => l.id === q.lab_id);
+          const labProducts = (lensProducts.data ?? []).filter(
+            (p) => p.active && (!q.lab_id || p.lab_id === q.lab_id),
+          );
+          const selectedLens = labProducts.find((p) => p.id === lensByQuote[q.id]);
           return (
             <div key={q.id} className="rounded-xl border border-border p-4 text-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -128,19 +132,44 @@ function PedidosPage() {
                     {q.quoted_amount_cents ? ` · Valor ${brl(q.quoted_amount_cents)}` : ""}
                   </p>
                 </div>
-                <select
-                  className="h-9 rounded-md border border-border bg-background px-2 text-xs"
-                  value={q.lab_id ?? ""}
-                  onChange={(e) => setLab.mutate({ id: q.id, labId: e.target.value })}
-                >
-                  <option value="">Vincular laboratório</option>
-                  {labs.data?.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-col gap-2">
+                  <select
+                    className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+                    value={q.lab_id ?? ""}
+                    onChange={(e) => setLab.mutate({ id: q.id, labId: e.target.value })}
+                  >
+                    <option value="">Vincular laboratório</option>
+                    {labs.data?.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+                    value={lensByQuote[q.id] ?? ""}
+                    onChange={(e) => setLensByQuote((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                  >
+                    <option value="">Escolher lente da tabela</option>
+                    {labProducts.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                        {p.refraction_index ? ` ${p.refraction_index}` : ""} — {brl(p.price_cents)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
+              {selectedLens && (
+                <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs text-muted-foreground">
+                  {selectedLens.name}
+                  {selectedLens.lens_type ? ` · ${selectedLens.lens_type}` : ""} · associado{" "}
+                  {brl(selectedLens.price_cents)} · custo {brl(selectedLens.cost_cents)} · margem{" "}
+                  {brl(selectedLens.price_cents - selectedLens.cost_cents)}
+                  {selectedLens.treatments.length > 0 && ` · ${selectedLens.treatments.join(", ")}`}
+                </p>
+              )}
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
@@ -155,31 +184,35 @@ function PedidosPage() {
                       toast.error("Este associado não tem WhatsApp cadastrado.");
                       return;
                     }
-                    const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
-                    if (!raw) return;
-                    const cents = Math.round(Number(raw.replace(/\./g, "").replace(",", ".")) * 100);
-                    if (!Number.isFinite(cents) || cents <= 0) {
+                    let cents = selectedLens?.price_cents ?? null;
+                    if (!cents) {
+                      const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
+                      if (!raw) return;
+                      cents = parseBRLToCents(raw);
+                    }
+                    if (!cents || cents <= 0) {
                       toast.error("Valor inválido.");
                       return;
                     }
+                    const labId = q.lab_id ?? selectedLens?.lab_id ?? null;
                     const url = buildWhatsappUrl(
                       phoneDigits,
                       buildQuoteMessage({
                         memberName: profile?.full_name ?? null,
                         patientName: q.patient_name,
-                        lensType: q.lens_type,
+                        lensType: selectedLens ? selectedLens.name : q.lens_type,
                         amountCents: cents,
                       }),
                     );
                     const win = window.open(url, "_blank", "noopener,noreferrer");
                     try {
-                      await sendQuote.mutateAsync({ id: q.id, amountCents: cents, labId: q.lab_id });
+                      await sendQuote.mutateAsync({ id: q.id, amountCents: cents, labId });
                     } catch {
                       win?.close();
                     }
                   }}
                 >
-                  Enviar orçamento por WhatsApp
+                  {selectedLens ? `Enviar ${brl(selectedLens.price_cents)} por WhatsApp` : "Enviar orçamento por WhatsApp"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
                   Concluir
