@@ -5,7 +5,7 @@ import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { planBySlug } from "@/lib/plan-catalog";
 
 export const Route = createFileRoute("/_authenticated/assinar")({
-  validateSearch: (search: Record<string, unknown>): { plano?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { plano?: string | undefined } => ({
     plano: typeof search["plano"] === "string" ? search["plano"] : undefined,
   }),
   head: () => ({
