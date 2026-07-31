@@ -118,7 +118,7 @@ function AdminPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Orçamento enviado ao associado.");
+      toast.success("Orçamento registrado — abrindo o WhatsApp do associado.");
       queryClient.invalidateQueries({ queryKey: ["admin-quotes"] });
     },
     onError: () => toast.error("Não foi possível enviar o orçamento."),
