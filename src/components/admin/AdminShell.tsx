@@ -14,6 +14,7 @@ const links = [
   { to: "/admin/financeiro", label: "Financeiro", exact: false },
   { to: "/admin/suporte", label: "Suporte", exact: false },
   { to: "/admin/crm", label: "CRM", exact: false },
+  { to: "/admin/equipe", label: "Equipe", exact: false },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

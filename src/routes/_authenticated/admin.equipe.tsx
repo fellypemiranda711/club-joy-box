@@ -27,7 +27,7 @@ function AdminTeam() {
   const admins = useQuery({ queryKey: ["admin-team"], queryFn: () => fetchAdmins({}) });
 
   const inviteMutation = useMutation({
-    mutationFn: () => invite({ data: { email, fullName, tempPassword: tempPassword || undefined } }),
+    mutationFn: () => invite({ data: tempPassword ? { email, fullName, tempPassword } : { email, fullName } }),
     onSuccess: (res) => {
       const message =
         res.mode === "invited"
