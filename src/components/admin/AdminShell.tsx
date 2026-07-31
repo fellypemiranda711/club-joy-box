@@ -21,7 +21,7 @@ export function AdminNav() {
         <Link
           key={l.to}
           to={l.to}
-          activeOptions={{ exact: l.exact ?? false }}
+          activeOptions={{ exact: l.exact }}
           activeProps={{ className: "bg-primary text-primary-foreground" }}
           inactiveProps={{ className: "text-muted-foreground hover:bg-secondary" }}
           className="rounded-full px-3 py-1.5 text-xs transition-colors"
