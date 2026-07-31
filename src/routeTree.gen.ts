@@ -25,6 +25,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin.assinaturas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminLaboratoriosRouteImport } from './routes/_authenticated/admin.laboratorios'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -109,6 +110,12 @@ const AuthenticatedAdminClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLaboratoriosRoute =
+  AuthenticatedAdminLaboratoriosRouteImport.update({
+    id: '/laboratorios',
+    path: '/laboratorios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminPedidosRoute =
   AuthenticatedAdminPedidosRouteImport.update({
     id: '/pedidos',
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -155,6 +163,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -176,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/admin/assinaturas'
     | '/admin/clientes'
+    | '/admin/laboratorios'
     | '/admin/pedidos'
     | '/admin/'
     | '/api/public/payments/webhook'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/admin/assinaturas'
     | '/admin/clientes'
+    | '/admin/laboratorios'
     | '/admin/pedidos'
     | '/admin'
     | '/api/public/payments/webhook'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/admin/assinaturas'
     | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/laboratorios'
     | '/_authenticated/admin/pedidos'
     | '/_authenticated/admin/'
     | '/api/public/payments/webhook'
@@ -366,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/laboratorios': {
+      id: '/_authenticated/admin/laboratorios'
+      path: '/laboratorios'
+      fullPath: '/admin/laboratorios'
+      preLoaderRoute: typeof AuthenticatedAdminLaboratoriosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/pedidos': {
       id: '/_authenticated/admin/pedidos'
       path: '/pedidos'
@@ -386,6 +406,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAssinaturasRoute: typeof AuthenticatedAdminAssinaturasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminLaboratoriosRoute: typeof AuthenticatedAdminLaboratoriosRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -393,6 +414,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAssinaturasRoute: AuthenticatedAdminAssinaturasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminLaboratoriosRoute: AuthenticatedAdminLaboratoriosRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
