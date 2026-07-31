@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
@@ -42,7 +43,7 @@ const schema = z.object({
 function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "" });
+  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
   const [file, setFile] = useState<File | null>(null);
 
   const subscription = useQuery({
