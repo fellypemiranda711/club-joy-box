@@ -154,7 +154,7 @@ function AreaPage() {
             <InfoRow
               icon={<CreditCard className="h-4 w-4" />}
               label="Mensalidade"
-              value={`${sub.installments}x R$ ${(sub.monthly_price_cents / 100).toFixed(2).replace(".", ",")}`}
+              value={`R$ ${(sub.monthly_price_cents / 100).toFixed(2).replace(".", ",")}/mês`}
             />
             <InfoRow
               icon={<CalendarClock className="h-4 w-4" />}
