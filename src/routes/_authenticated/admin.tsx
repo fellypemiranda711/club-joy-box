@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MemberShell } from "@/components/member/MemberShell";
 import { useIsAdmin, useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
+import { measurementStatusLabels } from "@/lib/measurements";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -49,6 +50,20 @@ function AdminPage() {
     },
   });
 
+  const measurements = useQuery({
+    queryKey: ["admin-measurements"],
+    enabled: Boolean(isAdmin),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quote_measurements")
+        .select("*, quote_requests(patient_name, lens_type)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+
   const labs = useQuery({
     queryKey: ["admin-labs"],
     enabled: Boolean(isAdmin),
@@ -82,6 +97,53 @@ function AdminPage() {
     },
     onError: () => toast.error("Não foi possível atualizar a solicitação."),
   });
+
+  const sendQuote = useMutation({
+    mutationFn: async ({ id, amountCents }: { id: string; amountCents: number }) => {
+      const { error } = await supabase
+        .from("quote_requests")
+        .update({ status: "quoted", quoted_amount_cents: amountCents })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Orçamento enviado ao associado.");
+      queryClient.invalidateQueries({ queryKey: ["admin-quotes"] });
+    },
+    onError: () => toast.error("Não foi possível enviar o orçamento."),
+  });
+
+  const reviewMeasurement = useMutation({
+    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string | undefined }) => {
+      const { error } = await supabase
+        .from("quote_measurements")
+        .update({
+          status,
+          admin_notes: notes ?? null,
+          validated_by: user?.id ?? null,
+          validated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Medidas atualizadas.");
+      queryClient.invalidateQueries({ queryKey: ["admin-measurements"] });
+    },
+    onError: () => toast.error("Não foi possível atualizar as medidas."),
+  });
+
+  async function openPhoto(path: string | null) {
+    if (!path) return;
+    const { data, error } = await supabase.storage.from("measurements").createSignedUrl(path, 300);
+    if (error || !data) {
+      toast.error("Não foi possível abrir a foto.");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
+
 
   if (isLoading) {
     return (
@@ -154,9 +216,25 @@ function AdminPage() {
                   {q.lens_type || "—"} · {q.status} · {new Date(q.created_at).toLocaleDateString("pt-BR")}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
                   Em cotação
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
+                    if (!raw) return;
+                    const cents = Math.round(Number(raw.replace(/\./g, "").replace(",", ".")) * 100);
+                    if (!Number.isFinite(cents) || cents <= 0) {
+                      toast.error("Valor inválido.");
+                      return;
+                    }
+                    sendQuote.mutate({ id: q.id, amountCents: cents });
+                  }}
+                >
+                  Enviar orçamento
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
                   Concluir
@@ -167,6 +245,58 @@ function AdminPage() {
           {quotes.data?.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma solicitação ainda.</p>}
         </div>
       </section>
+
+      <section className="mt-10">
+        <h2 className="font-display text-lg font-semibold">Medidas enviadas por foto</h2>
+        <div className="mt-4 space-y-3">
+          {measurements.data?.map((m) => (
+            <div key={m.id} className="rounded-xl border border-border p-4 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-medium">{m.quote_requests?.patient_name ?? "Associado"}</p>
+                <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+                  {measurementStatusLabels[m.status] ?? m.status}
+                </span>
+              </div>
+              <p className="mt-2 text-muted-foreground">
+                DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura{" "}
+                {m.height_right_mm}/{m.height_left_mm} mm
+                {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
+                  Ver foto frontal
+                </Button>
+                {m.profile_photo_path && (
+                  <Button size="sm" variant="outline" onClick={() => openPhoto(m.profile_photo_path)}>
+                    Ver foto de perfil
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  onClick={() => reviewMeasurement.mutate({ id: m.id, status: "validated" })}
+                >
+                  Conferir e aprovar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    const notes = window.prompt("O que precisa ser refeito?") ?? undefined;
+                    reviewMeasurement.mutate({ id: m.id, status: "rejected", notes });
+                  }}
+                >
+                  Pedir para refazer
+                </Button>
+              </div>
+            </div>
+          ))}
+          {measurements.data?.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhuma medida enviada ainda.</p>
+          )}
+        </div>
+      </section>
+
+
 
       <section className="mt-10">
         <h2 className="font-display text-lg font-semibold">Laboratórios parceiros</h2>

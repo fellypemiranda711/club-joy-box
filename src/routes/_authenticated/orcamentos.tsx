@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
+import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
@@ -116,6 +117,27 @@ function OrcamentosPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const respond = useMutation({
+    mutationFn: async ({ id, decision }: { id: string; decision: "approved" | "canceled" }) => {
+      const { error } = await supabase.rpc("respond_to_quote", {
+        _quote_id: id,
+        _decision: decision,
+      });
+      if (error) throw new Error("Não foi possível registrar sua resposta.");
+    },
+    onSuccess: (_d, vars) => {
+      toast.success(
+        vars.decision === "approved"
+          ? "Orçamento aprovado! Agora envie as medidas por foto."
+          : "Orçamento recusado.",
+      );
+      queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
 
   const sub = subscription.data;
   const isActive = isSubscriptionActive(sub);
@@ -253,6 +275,34 @@ function OrcamentosPage() {
                   <p className="mt-1 font-medium text-foreground">
                     Orçamento: R$ {(q.quoted_amount_cents / 100).toFixed(2).replace(".", ",")}
                   </p>
+                )}
+                {q.status === "quoted" && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      disabled={respond.isPending}
+                      onClick={() => respond.mutate({ id: q.id, decision: "approved" })}
+                    >
+                      Aprovar orçamento
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={respond.isPending}
+                      onClick={() => respond.mutate({ id: q.id, decision: "canceled" })}
+                    >
+                      Recusar
+                    </Button>
+                  </div>
+                )}
+                {(q.status === "approved" || q.status === "completed") && user && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-muted-foreground">
+                      Orçamento aprovado — agora envie as medidas (DP, DNP, altura e ângulo
+                      pantoscópico) por foto.
+                    </p>
+                    <MeasurementDialog quoteId={q.id} userId={user.id} patientName={q.patient_name} />
+                  </div>
                 )}
               </li>
             ))}
