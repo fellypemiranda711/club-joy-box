@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -14,6 +15,10 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
+
+function isAdminRoute(pathname: string) {
+  return pathname === "/admin-login" || pathname.startsWith("/admin");
+}
 
 function NotFoundComponent() {
   return (
@@ -123,16 +128,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const admin = isAdminRoute(location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col font-sans antialiased">
-        <Header />
+        {!admin && <Header />}
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        <Footer />
+        {admin ? (
+          <footer className="border-t border-border/60 bg-background px-6 py-5 text-center">
+            <p className="font-display text-sm font-semibold tracking-tight text-primary">Vision Club</p>
+          </footer>
+        ) : (
+          <Footer />
+        )}
       </div>
       <Toaster />
 
