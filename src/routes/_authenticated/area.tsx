@@ -23,15 +23,19 @@ export const Route = createFileRoute("/_authenticated/area")({
 });
 
 const statusLabels: Record<string, string> = {
-  pending: "Aguardando ativação",
+  pending: "Aguardando pagamento",
+  incomplete: "Aguardando pagamento",
+  trialing: "Período de teste",
   active: "Ativa",
+  past_due: "Pagamento pendente",
+  unpaid: "Pagamento em atraso",
   canceled: "Cancelada",
   expired: "Expirada",
 };
 
 function AreaPage() {
   const { user } = useSession();
-  const queryClient = useQueryClient();
+
 
   const profile = useQuery({
     queryKey: ["profile", user?.id],
