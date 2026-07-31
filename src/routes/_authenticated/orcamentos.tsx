@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
@@ -42,7 +43,7 @@ const schema = z.object({
 function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "" });
+  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
   const [file, setFile] = useState<File | null>(null);
 
   const subscription = useQuery({
@@ -90,18 +91,26 @@ function OrcamentosPage() {
         prescriptionPath = path;
       }
 
+      const frameNote =
+        form.has_frame === "sim"
+          ? "Já possui a armação: Sim"
+          : form.has_frame === "nao"
+            ? "Já possui a armação: Não"
+            : "";
+      const notes = [frameNote, parsed.data.notes].filter(Boolean).join("\n");
+
       const { error } = await supabase.from("quote_requests").insert({
         user_id: user!.id,
         patient_name: parsed.data.patient_name,
         lens_type: parsed.data.lens_type || null,
-        notes: parsed.data.notes || null,
+        notes: notes || null,
         prescription_path: prescriptionPath,
       });
       if (error) throw new Error("Não foi possível registrar a solicitação.");
     },
     onSuccess: () => {
       toast.success("Solicitação enviada! Em breve retornamos com o orçamento.");
-      setForm({ patient_name: "", lens_type: "", notes: "" });
+      setForm({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
       setFile(null);
       queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
     },
@@ -180,6 +189,23 @@ function OrcamentosPage() {
             maxLength={120}
             onChange={(e) => setForm((f) => ({ ...f, lens_type: e.target.value }))}
           />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>Você já possui a armação?</Label>
+          <RadioGroup
+            className="flex gap-6 pt-1"
+            value={form.has_frame}
+            onValueChange={(v) => setForm((f) => ({ ...f, has_frame: v }))}
+          >
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="sim" id="frame-sim" />
+              <Label htmlFor="frame-sim" className="font-normal">Sim, já tenho</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="nao" id="frame-nao" />
+              <Label htmlFor="frame-nao" className="font-normal">Não, preciso de uma</Label>
+            </div>
+          </RadioGroup>
         </div>
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="prescription">Receita (PDF ou imagem, até 5 MB)</Label>
