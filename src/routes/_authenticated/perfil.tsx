@@ -84,10 +84,20 @@ function PerfilPage() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert({ id: user!.id, ...parsed.data })
-      .eq("id", user!.id);
+    const d = parsed.data;
+    const { error } = await supabase.from("profiles").upsert({
+      id: user!.id,
+      full_name: d.full_name,
+      cpf: d.cpf,
+      phone: d.phone,
+      cep: d.cep ?? null,
+      street: d.street ?? null,
+      number: d.number ?? null,
+      complement: d.complement ?? null,
+      district: d.district ?? null,
+      city: d.city ?? null,
+      state: d.state ?? null,
+    });
     setSaving(false);
     if (error) toast.error("Não foi possível salvar seus dados.");
     else toast.success("Dados atualizados com sucesso.");
