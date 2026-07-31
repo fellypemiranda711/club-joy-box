@@ -28,6 +28,7 @@ import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminComissoesRouteImport } from './routes/_authenticated/admin.comissoes'
 import { Route as AuthenticatedAdminCrmRouteImport } from './routes/_authenticated/admin.crm'
+import { Route as AuthenticatedAdminEquipeRouteImport } from './routes/_authenticated/admin.equipe'
 import { Route as AuthenticatedAdminFinanceiroRouteImport } from './routes/_authenticated/admin.financeiro'
 import { Route as AuthenticatedAdminLaboratoriosRouteImport } from './routes/_authenticated/admin.laboratorios'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
@@ -132,6 +133,12 @@ const AuthenticatedAdminCrmRoute = AuthenticatedAdminCrmRouteImport.update({
   path: '/crm',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminEquipeRoute =
+  AuthenticatedAdminEquipeRouteImport.update({
+    id: '/equipe',
+    path: '/equipe',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminFinanceiroRoute =
   AuthenticatedAdminFinanceiroRouteImport.update({
     id: '/financeiro',
@@ -187,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/crm': typeof AuthenticatedAdminCrmRoute
+  '/admin/equipe': typeof AuthenticatedAdminEquipeRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
@@ -212,6 +220,7 @@ export interface FileRoutesByTo {
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/crm': typeof AuthenticatedAdminCrmRoute
+  '/admin/equipe': typeof AuthenticatedAdminEquipeRoute
   '/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
@@ -240,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/_authenticated/admin/crm': typeof AuthenticatedAdminCrmRoute
+  '/_authenticated/admin/equipe': typeof AuthenticatedAdminEquipeRoute
   '/_authenticated/admin/financeiro': typeof AuthenticatedAdminFinanceiroRoute
   '/_authenticated/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/comissoes'
     | '/admin/crm'
+    | '/admin/equipe'
     | '/admin/financeiro'
     | '/admin/laboratorios'
     | '/admin/pedidos'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/admin/clientes'
     | '/admin/comissoes'
     | '/admin/crm'
+    | '/admin/equipe'
     | '/admin/financeiro'
     | '/admin/laboratorios'
     | '/admin/pedidos'
@@ -320,6 +332,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/comissoes'
     | '/_authenticated/admin/crm'
+    | '/_authenticated/admin/equipe'
     | '/_authenticated/admin/financeiro'
     | '/_authenticated/admin/laboratorios'
     | '/_authenticated/admin/pedidos'
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCrmRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/equipe': {
+      id: '/_authenticated/admin/equipe'
+      path: '/equipe'
+      fullPath: '/admin/equipe'
+      preLoaderRoute: typeof AuthenticatedAdminEquipeRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/financeiro': {
       id: '/_authenticated/admin/financeiro'
       path: '/financeiro'
@@ -527,6 +547,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminComissoesRoute: typeof AuthenticatedAdminComissoesRoute
   AuthenticatedAdminCrmRoute: typeof AuthenticatedAdminCrmRoute
+  AuthenticatedAdminEquipeRoute: typeof AuthenticatedAdminEquipeRoute
   AuthenticatedAdminFinanceiroRoute: typeof AuthenticatedAdminFinanceiroRoute
   AuthenticatedAdminLaboratoriosRoute: typeof AuthenticatedAdminLaboratoriosRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
@@ -540,6 +561,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminComissoesRoute: AuthenticatedAdminComissoesRoute,
   AuthenticatedAdminCrmRoute: AuthenticatedAdminCrmRoute,
+  AuthenticatedAdminEquipeRoute: AuthenticatedAdminEquipeRoute,
   AuthenticatedAdminFinanceiroRoute: AuthenticatedAdminFinanceiroRoute,
   AuthenticatedAdminLaboratoriosRoute: AuthenticatedAdminLaboratoriosRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
