@@ -114,7 +114,7 @@ function AdminPage() {
   });
 
   const reviewMeasurement = useMutation({
-    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
+    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string | undefined }) => {
       const { error } = await supabase
         .from("quote_measurements")
         .update({
