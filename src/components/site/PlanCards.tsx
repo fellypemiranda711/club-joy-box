@@ -17,7 +17,7 @@ export const plans: Plan[] = [
   {
     id: "essencial",
     name: "Essencial",
-    price: "10x R$ 19,90",
+    price: "R$ 19,90",
     period: "/mês",
     description: "Para quem precisa trocar as lentes uma vez por ano.",
     features: [
@@ -31,7 +31,7 @@ export const plans: Plan[] = [
   {
     id: "cuidado-mais",
     name: "Cuidado+",
-    price: "10x R$ 39,90",
+    price: "R$ 39,90",
     period: "/mês",
     description: "Cobertura ampliada para quem troca de lentes com frequência.",
     features: [
@@ -46,7 +46,7 @@ export const plans: Plan[] = [
   {
     id: "familia",
     name: "Família",
-    price: "10x R$ 89,90",
+    price: "R$ 89,90",
     period: "/mês",
     description: "Cobertura completa para toda a casa, em um único plano.",
     features: [
