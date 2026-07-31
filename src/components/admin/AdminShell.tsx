@@ -1,18 +1,18 @@
 import { Link } from "@tanstack/react-router";
 import { MemberShell } from "@/components/member/MemberShell";
 
-const links: { to: string; label: string; exact?: boolean }[] = [
+const links = [
   { to: "/admin", label: "Dashboard", exact: true },
-  { to: "/admin/clientes", label: "Clientes" },
-  { to: "/admin/assinaturas", label: "Assinaturas" },
-  { to: "/admin/pedidos", label: "Pedidos" },
-  { to: "/admin/laboratorios", label: "Laboratórios" },
-  { to: "/admin/comissoes", label: "Comissões" },
-  { to: "/admin/relatorios", label: "Relatórios" },
-  { to: "/admin/financeiro", label: "Financeiro" },
-  { to: "/admin/suporte", label: "Suporte" },
-  { to: "/admin/crm", label: "CRM" },
-];
+  { to: "/admin/clientes", label: "Clientes", exact: false },
+  { to: "/admin/assinaturas", label: "Assinaturas", exact: false },
+  { to: "/admin/pedidos", label: "Pedidos", exact: false },
+  { to: "/admin/laboratorios", label: "Laboratórios", exact: false },
+  { to: "/admin/comissoes", label: "Comissões", exact: false },
+  { to: "/admin/relatorios", label: "Relatórios", exact: false },
+  { to: "/admin/financeiro", label: "Financeiro", exact: false },
+  { to: "/admin/suporte", label: "Suporte", exact: false },
+  { to: "/admin/crm", label: "CRM", exact: false },
+] as const;
 
 export function AdminNav() {
   return (
