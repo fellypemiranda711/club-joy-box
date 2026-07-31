@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarClock, CreditCard, FileText, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,8 @@ import { MemberShell } from "@/components/member/MemberShell";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { planCatalog } from "@/lib/plan-catalog";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { createPortalSession } from "@/utils/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/area")({
   head: () => ({
