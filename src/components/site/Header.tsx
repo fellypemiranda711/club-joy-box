@@ -36,7 +36,10 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
+          <Link to="/auth" className="text-sm text-muted-foreground transition-colors hover:text-primary">
+            Área do associado
+          </Link>
           <Link
             to="/planos"
             className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
@@ -67,7 +70,11 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link to="/auth" onClick={() => setOpen(false)} className="text-sm text-muted-foreground">
+              Área do associado
+            </Link>
             <Link
+
               to="/planos"
               onClick={() => setOpen(false)}
               className="rounded-full bg-primary px-5 py-2 text-center text-sm font-medium text-primary-foreground"
