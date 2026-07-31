@@ -94,25 +94,25 @@ function Contato() {
           <div>
             <label htmlFor="nome" className="text-sm font-medium text-foreground">Nome</label>
             <input id="nome" name="nome" className={field} maxLength={100} />
-            {errors.nome && <p className="mt-2 text-xs text-destructive">{errors.nome}</p>}
+            {errors["nome"] && <p className="mt-2 text-xs text-destructive">{errors["nome"]}</p>}
           </div>
 
           <div className="mt-5">
             <label htmlFor="email" className="text-sm font-medium text-foreground">E-mail</label>
             <input id="email" name="email" type="email" className={field} maxLength={255} />
-            {errors.email && <p className="mt-2 text-xs text-destructive">{errors.email}</p>}
+            {errors["email"] && <p className="mt-2 text-xs text-destructive">{errors["email"]}</p>}
           </div>
 
           <div className="mt-5">
             <label htmlFor="telefone" className="text-sm font-medium text-foreground">Telefone</label>
             <input id="telefone" name="telefone" className={field} maxLength={20} />
-            {errors.telefone && <p className="mt-2 text-xs text-destructive">{errors.telefone}</p>}
+            {errors["telefone"] && <p className="mt-2 text-xs text-destructive">{errors["telefone"]}</p>}
           </div>
 
           <div className="mt-5">
             <label htmlFor="mensagem" className="text-sm font-medium text-foreground">Mensagem</label>
             <textarea id="mensagem" name="mensagem" rows={5} className={field} maxLength={1000} />
-            {errors.mensagem && <p className="mt-2 text-xs text-destructive">{errors.mensagem}</p>}
+            {errors["mensagem"] && <p className="mt-2 text-xs text-destructive">{errors["mensagem"]}</p>}
           </div>
 
           <button
