@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarClock, CreditCard, FileText, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,8 @@ import { MemberShell } from "@/components/member/MemberShell";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { planCatalog } from "@/lib/plan-catalog";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { createPortalSession } from "@/utils/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/area")({
   head: () => ({
@@ -21,15 +23,19 @@ export const Route = createFileRoute("/_authenticated/area")({
 });
 
 const statusLabels: Record<string, string> = {
-  pending: "Aguardando ativação",
+  pending: "Aguardando pagamento",
+  incomplete: "Aguardando pagamento",
+  trialing: "Período de teste",
   active: "Ativa",
+  past_due: "Pagamento pendente",
+  unpaid: "Pagamento em atraso",
   canceled: "Cancelada",
   expired: "Expirada",
 };
 
 function AreaPage() {
   const { user } = useSession();
-  const queryClient = useQueryClient();
+
 
   const profile = useQuery({
     queryKey: ["profile", user?.id],
@@ -71,25 +77,23 @@ function AreaPage() {
     },
   });
 
-  const subscribe = useMutation({
-    mutationFn: async (slug: string) => {
-      const plan = planCatalog.find((p) => p.slug === slug)!;
-      const { error } = await supabase.from("subscriptions").insert({
-        user_id: user!.id,
-        plan_slug: plan.slug,
-        plan_name: plan.name,
-        monthly_price_cents: plan.monthlyPriceCents,
+  const openPortal = useMutation({
+    mutationFn: async () => {
+      const result = await createPortalSession({
+        data: {
+          returnUrl: `${window.location.origin}/area`,
+          environment: getStripeEnvironment(),
+        },
       });
-      if (error) throw error;
+      if ("error" in result) throw new Error(result.error);
+      return result.url;
     },
-    onSuccess: () => {
-      toast.success("Plano solicitado! Nossa equipe vai confirmar a ativação.");
-      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
-    },
-    onError: () => toast.error("Não foi possível registrar seu plano."),
+    onSuccess: (url) => window.open(url, "_blank", "noopener"),
+    onError: (e: Error) => toast.error(e.message || "Não foi possível abrir a gestão de assinatura."),
   });
 
   const sub = subscription.data;
+  const hasBilling = Boolean(sub?.stripe_customer_id);
 
   return (
     <MemberShell>
@@ -102,7 +106,8 @@ function AreaPage() {
         <div className="mt-8 rounded-2xl border border-border p-6">
           <h2 className="font-display text-lg font-semibold">Escolha seu plano</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Selecione um plano para gerar sua carteirinha digital.
+            Selecione um plano, finalize o pagamento e sua carteirinha digital é gerada
+            automaticamente.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {planCatalog.map((plan) => (
@@ -110,18 +115,16 @@ function AreaPage() {
                 <p className="font-medium">{plan.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.priceLabel}</p>
                 <p className="mt-2 text-xs text-muted-foreground">{plan.summary}</p>
-                <Button
-                  size="sm"
-                  className="mt-4 w-full"
-                  disabled={subscribe.isPending}
-                  onClick={() => subscribe.mutate(plan.slug)}
-                >
-                  Assinar
+                <Button size="sm" className="mt-4 w-full" asChild>
+                  <Link to="/assinar" search={{ plano: plan.slug }}>
+                    Assinar
+                  </Link>
                 </Button>
               </div>
             ))}
           </div>
         </div>
+
       )}
 
       {sub && (
@@ -155,10 +158,32 @@ function AreaPage() {
             />
             <InfoRow
               icon={<CalendarClock className="h-4 w-4" />}
-              label="Início"
-              value={new Date(sub.started_at).toLocaleDateString("pt-BR")}
+              label={sub.current_period_end ? "Próxima cobrança" : "Início"}
+              value={new Date(sub.current_period_end ?? sub.started_at).toLocaleDateString("pt-BR")}
             />
+            {sub.cancel_at_period_end && (
+              <p className="text-xs text-muted-foreground">
+                Assinatura cancelada — acesso mantido até o fim do período pago.
+              </p>
+            )}
+            {hasBilling ? (
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={openPortal.isPending}
+                onClick={() => openPortal.mutate()}
+              >
+                Gerenciar assinatura e pagamentos
+              </Button>
+            ) : (
+              <Button className="w-full" asChild>
+                <Link to="/assinar" search={{ plano: sub.plan_slug }}>
+                  Concluir pagamento
+                </Link>
+              </Button>
+            )}
           </div>
+
         </div>
       )}
 
