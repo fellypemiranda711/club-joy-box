@@ -91,18 +91,26 @@ function OrcamentosPage() {
         prescriptionPath = path;
       }
 
+      const frameNote =
+        form.has_frame === "sim"
+          ? "Já possui a armação: Sim"
+          : form.has_frame === "nao"
+            ? "Já possui a armação: Não"
+            : "";
+      const notes = [frameNote, parsed.data.notes].filter(Boolean).join("\n");
+
       const { error } = await supabase.from("quote_requests").insert({
         user_id: user!.id,
         patient_name: parsed.data.patient_name,
         lens_type: parsed.data.lens_type || null,
-        notes: parsed.data.notes || null,
+        notes: notes || null,
         prescription_path: prescriptionPath,
       });
       if (error) throw new Error("Não foi possível registrar a solicitação.");
     },
     onSuccess: () => {
       toast.success("Solicitação enviada! Em breve retornamos com o orçamento.");
-      setForm({ patient_name: "", lens_type: "", notes: "" });
+      setForm({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
       setFile(null);
       queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
     },
