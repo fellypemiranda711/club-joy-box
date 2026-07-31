@@ -103,7 +103,8 @@ export function PlanCards() {
           </ul>
 
           <Link
-            to="/contato"
+            to="/assinar"
+            search={{ plano: plan.id }}
             className={cn(
               "mt-8 rounded-full px-5 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90",
               plan.available
