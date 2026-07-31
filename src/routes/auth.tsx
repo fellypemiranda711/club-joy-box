@@ -32,6 +32,12 @@ const signInSchema = z.object({
 });
 
 const signUpSchema = signInSchema.extend({
+  password: z
+    .string()
+    .min(8, { message: "A senha precisa ter ao menos 8 caracteres" })
+    .max(72)
+    .regex(/[A-Za-z]/, { message: "A senha precisa conter letras" })
+    .regex(/[0-9]/, { message: "A senha precisa conter números" }),
   fullName: z.string().trim().min(3, { message: "Informe seu nome completo" }).max(120),
   phone: z.string().trim().min(10, { message: "Informe um telefone válido" }).max(20),
 });
@@ -86,7 +92,19 @@ function AuthPage() {
           },
         });
         if (error) {
-          toast.error(error.message.includes("registered") ? "Este e-mail já está cadastrado." : "Não foi possível criar sua conta.");
+          const code = (error as { code?: string }).code ?? "";
+          const msg = error.message.toLowerCase();
+          if (code === "weak_password" || msg.includes("weak")) {
+            toast.error(
+              "Essa senha é muito comum e apareceu em vazamentos. Escolha outra senha mais forte (8+ caracteres, com letras, números e símbolos).",
+            );
+          } else if (msg.includes("registered") || msg.includes("already")) {
+            toast.error("Este e-mail já está cadastrado. Faça login ou recupere a senha.");
+          } else if (msg.includes("rate limit") || msg.includes("429")) {
+            toast.error("Muitas tentativas. Aguarde alguns minutos e tente novamente.");
+          } else {
+            toast.error(error.message || "Não foi possível criar sua conta.");
+          }
           return;
         }
         if (data.session) {
