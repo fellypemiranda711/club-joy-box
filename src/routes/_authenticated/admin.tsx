@@ -49,6 +49,20 @@ function AdminPage() {
     },
   });
 
+  const measurements = useQuery({
+    queryKey: ["admin-measurements"],
+    enabled: Boolean(isAdmin),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quote_measurements")
+        .select("*, quote_requests(patient_name, lens_type)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+
   const labs = useQuery({
     queryKey: ["admin-labs"],
     enabled: Boolean(isAdmin),
