@@ -128,7 +128,7 @@ function Home() {
             <div className="overflow-hidden rounded-3xl border border-border bg-secondary/40">
               <img
                 src={heroImage}
-                alt="Óculos de grau moderno sem aro com lentes de alta qualidade"
+                alt="Família usando óculos de grau e de sol"
                 width={1408}
                 height={1104}
                 className="h-full w-full object-cover"
