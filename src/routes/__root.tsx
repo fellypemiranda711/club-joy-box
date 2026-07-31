@@ -128,16 +128,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+  const admin = isAdminRoute(location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col font-sans antialiased">
-        <Header />
+        {!admin && <Header />}
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        <Footer />
+        {admin ? (
+          <footer className="border-t border-border/60 bg-background px-6 py-5 text-center">
+            <p className="font-display text-sm font-semibold tracking-tight text-primary">Vision Club</p>
+          </footer>
+        ) : (
+          <Footer />
+        )}
       </div>
       <Toaster />
 
