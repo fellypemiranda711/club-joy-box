@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { MemberShell } from "@/components/member/MemberShell";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
-import { planCatalog } from "@/lib/plan-catalog";
+import { planBySlug, planCatalog } from "@/lib/plan-catalog";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { createPortalSession } from "@/utils/payments.functions";
 
@@ -114,6 +114,9 @@ function AreaPage() {
               <div key={plan.slug} className="rounded-xl border border-border p-4">
                 <p className="font-medium">{plan.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{plan.priceLabel}</p>
+                <p className="text-xs text-muted-foreground">
+                  Cobrança anual de {plan.annualLabel}
+                </p>
                 <p className="mt-2 text-xs text-muted-foreground">{plan.summary}</p>
                 <Button size="sm" className="mt-4 w-full" asChild>
                   <Link to="/assinar" search={{ plano: plan.slug }}>
@@ -153,12 +156,15 @@ function AreaPage() {
             <InfoRow icon={<ShieldCheck className="h-4 w-4" />} label="Status" value={statusLabels[sub.status] ?? sub.status} />
             <InfoRow
               icon={<CreditCard className="h-4 w-4" />}
-              label="Mensalidade"
-              value={`R$ ${(sub.monthly_price_cents / 100).toFixed(2).replace(".", ",")}/mês`}
+              label="Plano anual"
+              value={
+                planBySlug(sub.plan_slug)?.annualLabel ??
+                `R$ ${((sub.monthly_price_cents * 12) / 100).toFixed(2).replace(".", ",")}/ano`
+              }
             />
             <InfoRow
               icon={<CalendarClock className="h-4 w-4" />}
-              label={sub.current_period_end ? "Próxima cobrança" : "Início"}
+              label={sub.current_period_end ? "Próxima renovação" : "Início"}
               value={new Date(sub.current_period_end ?? sub.started_at).toLocaleDateString("pt-BR")}
             />
             {sub.cancel_at_period_end && (
