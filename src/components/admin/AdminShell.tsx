@@ -7,7 +7,9 @@ const links = [
   { to: "/admin", label: "Dashboard", exact: true },
   { to: "/admin/clientes", label: "Clientes", exact: false },
   { to: "/admin/assinaturas", label: "Assinaturas", exact: false },
+  { to: "/admin/orcamentos", label: "Orçamentos", exact: false },
   { to: "/admin/pedidos", label: "Pedidos", exact: false },
+
   { to: "/admin/laboratorios", label: "Laboratórios", exact: false },
   { to: "/admin/lentes", label: "Tabela de lentes", exact: false },
   { to: "/admin/comissoes", label: "Comissões", exact: false },
