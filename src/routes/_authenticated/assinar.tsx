@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/assinar")({
       { title: "Assinar plano | Vision Club" },
       {
         name: "description",
-        content: "Finalize a assinatura do seu plano Vision Club com pagamento mensal recorrente.",
+        content: "Finalize a assinatura anual do seu plano Vision Club em uma única cobrança.",
       },
       { property: "og:title", content: "Assinar plano | Vision Club" },
       {
@@ -46,11 +46,13 @@ function AssinarPage() {
           <>
             <div className="mt-6 rounded-2xl border border-border p-6">
               <p className="font-display text-lg font-semibold">Plano {plan.name}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{plan.priceLabel}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {plan.priceLabel} · cobrança única de {plan.annualLabel}
+              </p>
               <p className="mt-2 text-sm text-muted-foreground">{plan.summary}</p>
               <p className="mt-4 text-xs text-muted-foreground">
-                Cobrança mensal recorrente no cartão. Você pode cancelar quando quiser pela sua
-                área do associado.
+                Cobrança anual única no cartão, com renovação automática a cada 12 meses. Você
+                pode cancelar quando quiser pela sua área do associado.
               </p>
             </div>
             <StripeEmbeddedCheckout
