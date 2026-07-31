@@ -254,6 +254,34 @@ function OrcamentosPage() {
                     Orçamento: R$ {(q.quoted_amount_cents / 100).toFixed(2).replace(".", ",")}
                   </p>
                 )}
+                {q.status === "quoted" && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      disabled={respond.isPending}
+                      onClick={() => respond.mutate({ id: q.id, decision: "approved" })}
+                    >
+                      Aprovar orçamento
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={respond.isPending}
+                      onClick={() => respond.mutate({ id: q.id, decision: "canceled" })}
+                    >
+                      Recusar
+                    </Button>
+                  </div>
+                )}
+                {(q.status === "approved" || q.status === "completed") && user && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-muted-foreground">
+                      Orçamento aprovado — agora envie as medidas (DP, DNP, altura e ângulo
+                      pantoscópico) por foto.
+                    </p>
+                    <MeasurementDialog quoteId={q.id} userId={user.id} patientName={q.patient_name} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>
