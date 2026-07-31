@@ -104,10 +104,15 @@ function PedidosPage() {
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   }
 
+  const paidQuotes = (quotes.data ?? []).filter((q) => q.status === "approved" || q.status === "completed");
+
   return (
-    <AdminPage title="Pedidos" description="Solicitações de orçamento e conferência das medidas enviadas por foto.">
+    <AdminPage
+      title="Pedidos"
+      description="Somente pedidos aprovados e pagos pelo associado, com a lente escolhida e as medidas conferidas."
+    >
       <section className="space-y-3">
-        {quotes.data?.map((q) => {
+        {paidQuotes.map((q) => {
           const profile = profiles.data?.find((p) => p.id === q.user_id);
           const phoneDigits = toE164Digits(profile?.phone);
           const lab = labs.data?.find((l) => l.id === q.lab_id);
@@ -115,6 +120,8 @@ function PedidosPage() {
             (p) => p.active && (!q.lab_id || p.lab_id === q.lab_id),
           );
           const selectedLens = labProducts.find((p) => p.id === lensByQuote[q.id]);
+          const quoteMeasurements = (measurements.data ?? []).filter((m) => m.quote_id === q.id);
+
           return (
             <div key={q.id} className="rounded-xl border border-border p-4 text-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
