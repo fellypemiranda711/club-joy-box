@@ -97,6 +97,53 @@ function AdminPage() {
     onError: () => toast.error("Não foi possível atualizar a solicitação."),
   });
 
+  const sendQuote = useMutation({
+    mutationFn: async ({ id, amountCents }: { id: string; amountCents: number }) => {
+      const { error } = await supabase
+        .from("quote_requests")
+        .update({ status: "quoted", quoted_amount_cents: amountCents })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Orçamento enviado ao associado.");
+      queryClient.invalidateQueries({ queryKey: ["admin-quotes"] });
+    },
+    onError: () => toast.error("Não foi possível enviar o orçamento."),
+  });
+
+  const reviewMeasurement = useMutation({
+    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
+      const { error } = await supabase
+        .from("quote_measurements")
+        .update({
+          status,
+          admin_notes: notes ?? null,
+          validated_by: user?.id ?? null,
+          validated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Medidas atualizadas.");
+      queryClient.invalidateQueries({ queryKey: ["admin-measurements"] });
+    },
+    onError: () => toast.error("Não foi possível atualizar as medidas."),
+  });
+
+  async function openPhoto(path: string | null) {
+    if (!path) return;
+    const { data, error } = await supabase.storage.from("measurements").createSignedUrl(path, 300);
+    if (error || !data) {
+      toast.error("Não foi possível abrir a foto.");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
+
+
   if (isLoading) {
     return (
       <MemberShell>
