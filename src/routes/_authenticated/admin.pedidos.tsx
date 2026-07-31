@@ -178,10 +178,71 @@ function PedidosPage() {
                 </p>
               )}
 
+              <div className="mt-3 grid gap-2 rounded-lg bg-secondary/60 px-3 py-2 text-xs text-muted-foreground sm:grid-cols-2">
+                <p>Tipo de lente: {selectedLens?.name ?? q.lens_type ?? "—"}</p>
+                <p>
+                  Tratamentos:{" "}
+                  {(selectedLens?.treatments?.length ? selectedLens.treatments : q.treatments).join(", ") || "—"}
+                </p>
+                <p>Valor ao associado: {brl(selectedLens?.price_cents ?? q.quoted_amount_cents)}</p>
+                <p>
+                  Custo/margem:{" "}
+                  {selectedLens
+                    ? `${brl(selectedLens.cost_cents)} · ${brl(selectedLens.price_cents - selectedLens.cost_cents)}`
+                    : "—"}
+                </p>
+                {q.notes && <p className="sm:col-span-2">Observações: {q.notes}</p>}
+              </div>
+
+              <div className="mt-3 space-y-3">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Medidas</p>
+                {quoteMeasurements.length === 0 && (
+                  <p className="text-xs text-muted-foreground">Nenhuma medida enviada por foto ainda.</p>
+                )}
+                {quoteMeasurements.map((m) => (
+                  <div key={m.id} className="rounded-lg border border-border p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground">
+                        Enviadas em {new Date(m.created_at).toLocaleDateString("pt-BR")}
+                      </p>
+                      <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+                        {measurementStatusLabels[m.status] ?? m.status}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura {m.height_right_mm}/
+                      {m.height_left_mm} mm
+                      {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
+                    </p>
+                    {m.admin_notes && <p className="mt-1 text-xs text-muted-foreground">Nota: {m.admin_notes}</p>}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
+                        Ver foto frontal
+                      </Button>
+                      {m.profile_photo_path && (
+                        <Button size="sm" variant="outline" onClick={() => openPhoto(m.profile_photo_path)}>
+                          Ver foto de perfil
+                        </Button>
+                      )}
+                      <Button size="sm" onClick={() => reviewMeasurement.mutate({ id: m.id, status: "validated" })}>
+                        Conferir e aprovar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          const notes = window.prompt("O que precisa ser refeito?") ?? undefined;
+                          reviewMeasurement.mutate({ id: m.id, status: "rejected", notes });
+                        }}
+                      >
+                        Pedir para refazer
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
-                  Em cotação
-                </Button>
                 <Button
                   size="sm"
                   variant="outline"
@@ -191,7 +252,7 @@ function PedidosPage() {
                       toast.error("Este associado não tem WhatsApp cadastrado.");
                       return;
                     }
-                    let cents = selectedLens?.price_cents ?? null;
+                    let cents = selectedLens?.price_cents ?? q.quoted_amount_cents ?? null;
                     if (!cents) {
                       const raw = window.prompt("Valor do orçamento em reais (ex: 890,00)");
                       if (!raw) return;
@@ -219,65 +280,20 @@ function PedidosPage() {
                     }
                   }}
                 >
-                  {selectedLens ? `Enviar ${brl(selectedLens.price_cents)} por WhatsApp` : "Enviar orçamento por WhatsApp"}
+                  Falar no WhatsApp
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
-                  Concluir
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "canceled" })}>
-                  Cancelar
-                </Button>
+                {q.status !== "completed" && (
+                  <Button size="sm" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "completed" })}>
+                    Concluir
+                  </Button>
+                )}
               </div>
             </div>
           );
         })}
-        {quotes.data?.length === 0 && <Empty>Nenhum pedido ainda.</Empty>}
+        {paidQuotes.length === 0 && <Empty>Nenhum pedido aprovado e pago ainda.</Empty>}
       </section>
 
-      <section className="mt-10">
-        <h2 className="font-display text-lg font-semibold">Medidas enviadas por foto</h2>
-        <div className="mt-4 space-y-3">
-          {measurements.data?.map((m) => (
-            <div key={m.id} className="rounded-xl border border-border p-4 text-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-medium">{m.quote_requests?.patient_name ?? "Associado"}</p>
-                <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
-                  {measurementStatusLabels[m.status] ?? m.status}
-                </span>
-              </div>
-              <p className="mt-2 text-muted-foreground">
-                DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura {m.height_right_mm}/
-                {m.height_left_mm} mm
-                {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
-                  Ver foto frontal
-                </Button>
-                {m.profile_photo_path && (
-                  <Button size="sm" variant="outline" onClick={() => openPhoto(m.profile_photo_path)}>
-                    Ver foto de perfil
-                  </Button>
-                )}
-                <Button size="sm" onClick={() => reviewMeasurement.mutate({ id: m.id, status: "validated" })}>
-                  Conferir e aprovar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    const notes = window.prompt("O que precisa ser refeito?") ?? undefined;
-                    reviewMeasurement.mutate({ id: m.id, status: "rejected", notes });
-                  }}
-                >
-                  Pedir para refazer
-                </Button>
-              </div>
-            </div>
-          ))}
-          {measurements.data?.length === 0 && <Empty>Nenhuma medida enviada ainda.</Empty>}
-        </div>
-      </section>
     </AdminPage>
   );
 }
