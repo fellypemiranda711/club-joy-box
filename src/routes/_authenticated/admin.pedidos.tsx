@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import {
   useAdminGate,
   useAdminLabs,
+  useAdminLensProducts,
   useAdminMeasurements,
   useAdminProfiles,
   useAdminQuotes,
 } from "@/hooks/use-admin-data";
 import { brl, quoteStatusLabels } from "@/lib/admin";
 import { measurementStatusLabels } from "@/lib/measurements";
-import { buildQuoteMessage, buildWhatsappUrl, toE164Digits } from "@/lib/whatsapp";
+import { buildQuoteMessage, buildWhatsappUrl, parseBRLToCents, toE164Digits } from "@/lib/whatsapp";
 import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/_authenticated/admin/pedidos")({
@@ -26,8 +28,10 @@ function PedidosPage() {
   const quotes = useAdminQuotes(isAdmin);
   const profiles = useAdminProfiles(isAdmin);
   const labs = useAdminLabs(isAdmin);
+  const lensProducts = useAdminLensProducts(isAdmin);
   const measurements = useAdminMeasurements(isAdmin);
   const queryClient = useQueryClient();
+  const [lensByQuote, setLensByQuote] = useState<Record<string, string>>({});
 
   const setQuoteStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
