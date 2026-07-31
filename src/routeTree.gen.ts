@@ -28,6 +28,7 @@ import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminComissoesRouteImport } from './routes/_authenticated/admin.comissoes'
 import { Route as AuthenticatedAdminLaboratoriosRouteImport } from './routes/_authenticated/admin.laboratorios'
 import { Route as AuthenticatedAdminPedidosRouteImport } from './routes/_authenticated/admin.pedidos'
+import { Route as AuthenticatedAdminRelatoriosRouteImport } from './routes/_authenticated/admin.relatorios'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -129,6 +130,12 @@ const AuthenticatedAdminPedidosRoute =
     path: '/pedidos',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminRelatoriosRoute =
+  AuthenticatedAdminRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -197,6 +206,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
   '/_authenticated/admin/laboratorios': typeof AuthenticatedAdminLaboratoriosRoute
   '/_authenticated/admin/pedidos': typeof AuthenticatedAdminPedidosRoute
+  '/_authenticated/admin/relatorios': typeof AuthenticatedAdminRelatoriosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin/comissoes'
     | '/admin/laboratorios'
     | '/admin/pedidos'
+    | '/admin/relatorios'
     | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/admin/comissoes'
     | '/admin/laboratorios'
     | '/admin/pedidos'
+    | '/admin/relatorios'
     | '/admin'
     | '/api/public/payments/webhook'
   id:
@@ -262,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/comissoes'
     | '/_authenticated/admin/laboratorios'
     | '/_authenticated/admin/pedidos'
+    | '/_authenticated/admin/relatorios'
     | '/_authenticated/admin/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPedidosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/relatorios': {
+      id: '/_authenticated/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AuthenticatedAdminRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -429,6 +449,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminComissoesRoute: typeof AuthenticatedAdminComissoesRoute
   AuthenticatedAdminLaboratoriosRoute: typeof AuthenticatedAdminLaboratoriosRoute
   AuthenticatedAdminPedidosRoute: typeof AuthenticatedAdminPedidosRoute
+  AuthenticatedAdminRelatoriosRoute: typeof AuthenticatedAdminRelatoriosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -438,6 +459,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminComissoesRoute: AuthenticatedAdminComissoesRoute,
   AuthenticatedAdminLaboratoriosRoute: AuthenticatedAdminLaboratoriosRoute,
   AuthenticatedAdminPedidosRoute: AuthenticatedAdminPedidosRoute,
+  AuthenticatedAdminRelatoriosRoute: AuthenticatedAdminRelatoriosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
