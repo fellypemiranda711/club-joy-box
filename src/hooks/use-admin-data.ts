@@ -79,3 +79,18 @@ export function useAdminLabs(enabled: boolean) {
     },
   });
 }
+
+export function useAdminLensProducts(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-lens-products"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("lab_lens_products")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}

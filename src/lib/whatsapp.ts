@@ -38,3 +38,12 @@ export function buildQuoteMessage(params: {
 export function buildWhatsappUrl(phoneDigits: string, message: string): string {
   return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
 }
+
+/** Converte um valor digitado em reais (ex: "1.290,50" ou "890") para centavos. */
+export function parseBRLToCents(raw: string | null | undefined): number | null {
+  if (!raw) return null;
+  const normalized = raw.replace(/[^\d.,-]/g, "").replace(/\./g, "").replace(",", ".");
+  const value = Number(normalized);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.round(value * 100);
+}
