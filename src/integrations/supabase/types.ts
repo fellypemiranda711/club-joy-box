@@ -101,6 +101,80 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_measurements: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          dnp_left_mm: number | null
+          dnp_right_mm: number | null
+          front_photo_path: string | null
+          height_left_mm: number | null
+          height_right_mm: number | null
+          id: string
+          pantoscopic_angle_deg: number | null
+          pd_mm: number | null
+          points: Json
+          profile_photo_path: string | null
+          quote_id: string
+          reference_width_mm: number
+          status: string
+          updated_at: string
+          user_id: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          dnp_left_mm?: number | null
+          dnp_right_mm?: number | null
+          front_photo_path?: string | null
+          height_left_mm?: number | null
+          height_right_mm?: number | null
+          id?: string
+          pantoscopic_angle_deg?: number | null
+          pd_mm?: number | null
+          points?: Json
+          profile_photo_path?: string | null
+          quote_id: string
+          reference_width_mm?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          dnp_left_mm?: number | null
+          dnp_right_mm?: number | null
+          front_photo_path?: string | null
+          height_left_mm?: number | null
+          height_right_mm?: number | null
+          id?: string
+          pantoscopic_angle_deg?: number | null
+          pd_mm?: number | null
+          points?: Json
+          profile_photo_path?: string | null
+          quote_id?: string
+          reference_width_mm?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_measurements_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: true
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           admin_notes: string | null
