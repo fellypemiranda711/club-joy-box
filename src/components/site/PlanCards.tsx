@@ -11,11 +11,13 @@ export type Plan = {
   features: string[];
   highlight?: boolean;
   available: boolean;
+  annualNote?: string;
 };
 
 export const plans: Plan[] = [
   {
     id: "essencial",
+    annualNote: "Cobrança anual única de R$ 238,80",
     name: "Essencial",
     price: "R$ 19,90",
     period: "/mês",
@@ -30,6 +32,7 @@ export const plans: Plan[] = [
   },
   {
     id: "cuidado-mais",
+    annualNote: "Cobrança anual única de R$ 478,80",
     name: "Cuidado+",
     price: "R$ 39,90",
     period: "/mês",
@@ -45,6 +48,7 @@ export const plans: Plan[] = [
   },
   {
     id: "familia",
+    annualNote: "Cobrança anual única de R$ 1.078,80",
     name: "Família",
     price: "R$ 89,90",
     period: "/mês",
@@ -91,6 +95,9 @@ export function PlanCards() {
             </span>
             <span className="pb-1 text-sm text-muted-foreground">{plan.period}</span>
           </div>
+          {plan.annualNote && (
+            <p className="mt-2 text-xs text-muted-foreground">{plan.annualNote}</p>
+          )}
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{plan.description}</p>
 
           <ul className="mt-8 flex-1 space-y-3">
