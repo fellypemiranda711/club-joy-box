@@ -118,6 +118,27 @@ function OrcamentosPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const respond = useMutation({
+    mutationFn: async ({ id, decision }: { id: string; decision: "approved" | "canceled" }) => {
+      const { error } = await supabase.rpc("respond_to_quote", {
+        _quote_id: id,
+        _decision: decision,
+      });
+      if (error) throw new Error("Não foi possível registrar sua resposta.");
+    },
+    onSuccess: (_d, vars) => {
+      toast.success(
+        vars.decision === "approved"
+          ? "Orçamento aprovado! Agora envie as medidas por foto."
+          : "Orçamento recusado.",
+      );
+      queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
+
   const sub = subscription.data;
   const isActive = isSubscriptionActive(sub);
   const plan = planBySlug(sub?.plan_slug);
