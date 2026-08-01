@@ -9,58 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminGate, useAdminLabs, useAdminLensProducts } from "@/hooks/use-admin-data";
 import { brl } from "@/lib/admin";
-import { parseBRLToCents } from "@/lib/whatsapp";
+
 
 export const Route = createFileRoute("/_authenticated/admin/lentes")({
   component: LensTablePage,
 });
-
-const emptyForm = {
-  lab_id: "",
-  name: "",
-  lens_type: "",
-  refraction_index: "",
-  treatments: "",
-  cost: "",
-  price: "",
-  notes: "",
-};
 
 function LensTablePage() {
   const { isAdmin } = useAdminGate();
   const labs = useAdminLabs(isAdmin);
   const products = useAdminLensProducts(isAdmin);
   const queryClient = useQueryClient();
-  const [form, setForm] = useState(emptyForm);
   const [labFilter, setLabFilter] = useState("");
   const [search, setSearch] = useState("");
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-lens-products"] });
 
-  const createProduct = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from("lab_lens_products").insert({
-        lab_id: form.lab_id,
-        name: form.name.trim(),
-        lens_type: form.lens_type.trim() || null,
-        refraction_index: form.refraction_index.trim() || null,
-        treatments: form.treatments
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-        cost_cents: parseBRLToCents(form.cost) ?? 0,
-        price_cents: parseBRLToCents(form.price) ?? 0,
-        notes: form.notes.trim() || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Lente adicionada à tabela.");
-      setForm({ ...emptyForm, lab_id: form.lab_id });
-      invalidate();
-    },
-    onError: () => toast.error("Não foi possível salvar a lente."),
-  });
 
   const toggleActive = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
