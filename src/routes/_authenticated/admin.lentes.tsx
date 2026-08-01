@@ -100,7 +100,36 @@ function LensTablePage() {
       title="Tabela de lentes"
       description="Catálogo de lentes por laboratório usado para montar os orçamentos dos associados."
     >
+      <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-background p-4">
+        <div className="flex flex-1 items-center gap-2">
+          <Label className="text-xs whitespace-nowrap">Buscar lente</Label>
+          <Input
+            placeholder="Nome ou código da lente..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 max-w-xs"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs whitespace-nowrap">Laboratório</Label>
+          <select
+            className="h-9 rounded-md border border-border bg-background px-2 text-sm"
+            value={labFilter}
+            onChange={(e) => setLabFilter(e.target.value)}
+          >
+            <option value="">Todos</option>
+            {labs.data?.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <span className="text-xs text-muted-foreground">{filtered.length} lente(s)</span>
+      </div>
+
       <form
+
         className="grid gap-3 rounded-2xl border border-border bg-background p-5 sm:grid-cols-3"
         onSubmit={(e) => {
           e.preventDefault();
@@ -156,32 +185,8 @@ function LensTablePage() {
         </div>
       </form>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="flex flex-1 items-center gap-2">
-          <Label className="text-xs whitespace-nowrap">Buscar lente</Label>
-          <Input
-            placeholder="Nome ou código da lente..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-9 max-w-xs"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Label className="text-xs whitespace-nowrap">Laboratório</Label>
-          <select
-            className="h-9 rounded-md border border-border bg-background px-2 text-sm"
-            value={labFilter}
-            onChange={(e) => setLabFilter(e.target.value)}
-          >
-            <option value="">Todos</option>
-            {labs.data?.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+
+
 
       <div className="mt-4 space-y-3">
         {filtered.map((p) => {
