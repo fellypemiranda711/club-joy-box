@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { brl } from "@/lib/admin";
 import { MARKET_MULTIPLIER, marketPriceCents, savingsPercent, visionTiers } from "@/lib/quote-options";
 import { buildOptionsMessage, buildWhatsappUrl, parseBRLToCents } from "@/lib/whatsapp";
+import { VisionFieldPreview } from "@/components/VisionFieldPreview";
 
 type LensProduct = {
   id: string;
