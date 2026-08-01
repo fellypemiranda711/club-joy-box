@@ -128,62 +128,6 @@ function LensTablePage() {
         <span className="text-xs text-muted-foreground">{filtered.length} lente(s)</span>
       </div>
 
-      <form
-
-        className="grid gap-3 rounded-2xl border border-border bg-background p-5 sm:grid-cols-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!form.lab_id) {
-            toast.error("Selecione o laboratório.");
-            return;
-          }
-          if (form.name.trim().length < 2) {
-            toast.error("Informe o nome da lente.");
-            return;
-          }
-          createProduct.mutate();
-        }}
-      >
-        <div className="space-y-1">
-          <Label className="text-xs">Laboratório</Label>
-          <select
-            className="h-10 w-full rounded-md border border-border bg-background px-2 text-sm"
-            value={form.lab_id}
-            onChange={(e) => setForm({ ...form, lab_id: e.target.value })}
-          >
-            <option value="">Selecione</option>
-            {labs.data?.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Field label="Nome da lente" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
-        <Field
-          label="Tipo (visão simples, multifocal...)"
-          value={form.lens_type}
-          onChange={(v) => setForm({ ...form, lens_type: v })}
-        />
-        <Field
-          label="Índice (1.56, 1.67...)"
-          value={form.refraction_index}
-          onChange={(v) => setForm({ ...form, refraction_index: v })}
-        />
-        <Field
-          label="Tratamentos (separados por vírgula)"
-          value={form.treatments}
-          onChange={(v) => setForm({ ...form, treatments: v })}
-        />
-        <Field label="Custo do laboratório (R$)" value={form.cost} onChange={(v) => setForm({ ...form, cost: v })} />
-        <Field label="Preço ao associado (R$)" value={form.price} onChange={(v) => setForm({ ...form, price: v })} />
-        <Field label="Observações" value={form.notes} onChange={(v) => setForm({ ...form, notes: v })} />
-        <div className="flex items-end sm:col-span-3">
-          <Button type="submit" disabled={createProduct.isPending}>
-            Adicionar lente
-          </Button>
-        </div>
-      </form>
 
 
 
