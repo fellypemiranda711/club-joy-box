@@ -157,6 +157,16 @@ function OrcamentosPage() {
                 </p>
               )}
 
+              <QuoteOptionsEditor
+                quoteId={q.id}
+                labId={q.lab_id}
+                patientName={q.patient_name}
+                memberName={profile?.full_name ?? null}
+                phoneDigits={phoneDigits}
+                lensProducts={lensProducts.data ?? []}
+              />
+
+
               <div className="mt-3 flex flex-wrap gap-2">
                 {q.prescription_path && (
                   <Button size="sm" variant="outline" onClick={() => openPrescription(q.prescription_path)}>
