@@ -53,8 +53,31 @@ const schema = z.object({
 function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
+  const { quote_session: quoteSession } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const confirmedRef = useRef<string | null>(null);
   const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!quoteSession || confirmedRef.current === quoteSession) return;
+    confirmedRef.current = quoteSession;
+    (async () => {
+      try {
+        const result = await confirmQuotePayment({
+          data: { sessionId: quoteSession, environment: getStripeEnvironment() },
+        });
+        if ("error" in result) toast.error(result.error);
+        else if (result.paid) toast.success("Pagamento confirmado! Agora envie as medidas por foto.");
+        else toast.message("Pagamento ainda em processamento.");
+      } catch {
+        toast.error("Não foi possível confirmar o pagamento.");
+      }
+      queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
+      navigate({ search: {}, replace: true });
+    })();
+  }, [quoteSession, navigate, queryClient, user?.id]);
+
 
   const subscription = useQuery({
     queryKey: ["subscription", user?.id],
