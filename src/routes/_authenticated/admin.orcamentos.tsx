@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
+import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
+
 import { Button } from "@/components/ui/button";
 import {
   useAdminGate,
