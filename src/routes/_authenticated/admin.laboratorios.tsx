@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminGate, useAdminLabs, useAdminQuotes } from "@/hooks/use-admin-data";
 import { brl, commissionCents, isRevenueQuote } from "@/lib/admin";
+import { parseBRLToCents } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/admin/laboratorios")({
   component: LabsPage,
@@ -16,12 +17,50 @@ export const Route = createFileRoute("/_authenticated/admin/laboratorios")({
 
 const emptyForm = { name: "", contact_email: "", contact_phone: "", city: "", state: "", commission_percent: "10" };
 
+const emptyLensForm = {
+  lab_id: "",
+  name: "",
+  lens_type: "",
+  refraction_index: "",
+  treatments: "",
+  cost: "",
+  price: "",
+  notes: "",
+};
+
+
 function LabsPage() {
   const { isAdmin } = useAdminGate();
   const labs = useAdminLabs(isAdmin);
   const quotes = useAdminQuotes(isAdmin);
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyForm);
+  const [lensForm, setLensForm] = useState(emptyLensForm);
+
+  const createLens = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("lab_lens_products").insert({
+        lab_id: lensForm.lab_id,
+        name: lensForm.name.trim(),
+        lens_type: lensForm.lens_type.trim() || null,
+        refraction_index: lensForm.refraction_index.trim() || null,
+        treatments: lensForm.treatments
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+        cost_cents: parseBRLToCents(lensForm.cost) ?? 0,
+        price_cents: parseBRLToCents(lensForm.price) ?? 0,
+        notes: lensForm.notes.trim() || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lente adicionada à tabela.");
+      setLensForm({ ...emptyLensForm, lab_id: lensForm.lab_id });
+      queryClient.invalidateQueries({ queryKey: ["admin-lens-products"] });
+    },
+    onError: () => toast.error("Não foi possível salvar a lente."),
+  });
 
   const createLab = useMutation({
     mutationFn: async () => {
@@ -81,6 +120,78 @@ function LabsPage() {
           </Button>
         </div>
       </form>
+
+      <form
+        className="mt-6 grid gap-3 rounded-2xl border border-border p-5 sm:grid-cols-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!lensForm.lab_id) {
+            toast.error("Selecione o laboratório.");
+            return;
+          }
+          if (lensForm.name.trim().length < 2) {
+            toast.error("Informe o nome da lente.");
+            return;
+          }
+          createLens.mutate();
+        }}
+      >
+        <div className="sm:col-span-3">
+          <h2 className="font-display text-lg font-semibold">Cadastrar lente</h2>
+          <p className="text-sm text-muted-foreground">
+            As lentes cadastradas aqui aparecem na Tabela de lentes e nos orçamentos.
+          </p>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Laboratório</Label>
+          <select
+            className="h-10 w-full rounded-md border border-border bg-background px-2 text-sm"
+            value={lensForm.lab_id}
+            onChange={(e) => setLensForm({ ...lensForm, lab_id: e.target.value })}
+          >
+            <option value="">Selecione</option>
+            {labs.data?.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Field label="Nome da lente" value={lensForm.name} onChange={(v) => setLensForm({ ...lensForm, name: v })} />
+        <Field
+          label="Tipo (visão simples, multifocal...)"
+          value={lensForm.lens_type}
+          onChange={(v) => setLensForm({ ...lensForm, lens_type: v })}
+        />
+        <Field
+          label="Índice (1.56, 1.67...)"
+          value={lensForm.refraction_index}
+          onChange={(v) => setLensForm({ ...lensForm, refraction_index: v })}
+        />
+        <Field
+          label="Tratamentos (separados por vírgula)"
+          value={lensForm.treatments}
+          onChange={(v) => setLensForm({ ...lensForm, treatments: v })}
+        />
+        <Field
+          label="Custo do laboratório (R$)"
+          value={lensForm.cost}
+          onChange={(v) => setLensForm({ ...lensForm, cost: v })}
+        />
+        <Field
+          label="Preço ao associado (R$)"
+          value={lensForm.price}
+          onChange={(v) => setLensForm({ ...lensForm, price: v })}
+        />
+        <Field label="Observações" value={lensForm.notes} onChange={(v) => setLensForm({ ...lensForm, notes: v })} />
+        <div className="flex items-end sm:col-span-3">
+          <Button type="submit" disabled={createLens.isPending}>
+            Adicionar lente
+          </Button>
+        </div>
+      </form>
+
+
 
       <div className="mt-6 space-y-3">
         {labs.data?.map((l) => {
