@@ -83,10 +83,17 @@ function LensTablePage() {
     onError: () => toast.error("Não foi possível remover a lente."),
   });
 
-  const filtered = useMemo(
-    () => (products.data ?? []).filter((p) => !labFilter || p.lab_id === labFilter),
-    [products.data, labFilter],
-  );
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return (products.data ?? [])
+      .filter((p) => !labFilter || p.lab_id === labFilter)
+      .filter(
+        (p) =>
+          !term ||
+          p.name.toLowerCase().includes(term) ||
+          (p.notes ?? "").toLowerCase().includes(term),
+      );
+  }, [products.data, labFilter, search]);
 
   return (
     <AdminPage
