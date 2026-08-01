@@ -35,9 +35,43 @@ export function buildQuoteMessage(params: {
   ].join("\n");
 }
 
+export function buildOptionsMessage(params: {
+  memberName?: string | null;
+  patientName: string;
+  options: { tier: number; title: string; member_price_cents: number; market_price_cents: number }[];
+}): string {
+  const firstName = (params.memberName ?? "").trim().split(" ")[0];
+  const greeting = firstName ? `Olá, ${firstName}!` : "Olá!";
+  const lines = params.options
+    .slice()
+    .sort((a, b) => a.tier - b.tier)
+    .map((o) =>
+      [
+        `${o.tier}) ${o.title}`,
+        `Associado: ${formatBRL(o.member_price_cents)}`,
+        `Média das óticas: ${formatBRL(o.market_price_cents)}`,
+        `Economia: ${formatBRL(Math.max(o.market_price_cents - o.member_price_cents, 0))}`,
+      ].join("\n"),
+    )
+    .join("\n\n");
+
+  return [
+    `${greeting} Aqui é da equipe Vision Club. 👋`,
+    "",
+    `Preparamos as opções de lentes para ${params.patientName}, da mais simples à mais completa em campo de visão:`,
+    "",
+    lines,
+    "",
+    "Você pode comparar e escolher a sua opção direto na sua área de associado, em Solicitações de orçamento.",
+    "",
+    "Qualquer dúvida, é só falar comigo por aqui. 😊",
+  ].join("\n");
+}
+
 export function buildWhatsappUrl(phoneDigits: string, message: string): string {
   return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
 }
+
 
 /** Converte um valor digitado em reais (ex: "1.290,50" ou "890") para centavos. */
 export function parseBRLToCents(raw: string | null | undefined): number | null {
