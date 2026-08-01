@@ -9,12 +9,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAdminGate, useAdminLabs, useAdminQuotes } from "@/hooks/use-admin-data";
 import { brl, commissionCents, isRevenueQuote } from "@/lib/admin";
+import { parseBRLToCents } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/admin/laboratorios")({
   component: LabsPage,
 });
 
 const emptyForm = { name: "", contact_email: "", contact_phone: "", city: "", state: "", commission_percent: "10" };
+
+const emptyLensForm = {
+  lab_id: "",
+  name: "",
+  lens_type: "",
+  refraction_index: "",
+  treatments: "",
+  cost: "",
+  price: "",
+  notes: "",
+};
+
 
 function LabsPage() {
   const { isAdmin } = useAdminGate();
