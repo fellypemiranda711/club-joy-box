@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/whatsapp";
 import { savingsCents, savingsPercent, tierMeta } from "@/lib/quote-options";
+import { VisionFieldPreview } from "@/components/VisionFieldPreview";
 
 export function QuoteOptionsPicker(props: { quoteId: string; canChoose: boolean; userId?: string }) {
   const queryClient = useQueryClient();
@@ -59,6 +60,12 @@ export function QuoteOptionsPicker(props: { quoteId: string; canChoose: boolean;
               </div>
               <p className="mt-1 font-medium">{o.title}</p>
               <p className="mt-1 text-xs text-muted-foreground">{o.description || meta.description}</p>
+
+              <VisionFieldPreview
+                className="mt-3"
+                tier={o.tier}
+                label={`Simulação do campo de visão — ${meta.title}`}
+              />
 
               <div className="mt-3">
                 <div className="flex items-center justify-between text-[11px] text-muted-foreground">
