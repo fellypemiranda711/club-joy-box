@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { brl } from "@/lib/admin";
 import { MARKET_MULTIPLIER, marketPriceCents, savingsPercent, visionTiers } from "@/lib/quote-options";
 import { buildOptionsMessage, buildWhatsappUrl, parseBRLToCents } from "@/lib/whatsapp";
+import { VisionFieldPreview } from "@/components/VisionFieldPreview";
 
 type LensProduct = {
   id: string;
@@ -186,6 +187,7 @@ export function QuoteOptionsEditor(props: {
                 </span>
                 <span>{t.description}</span>
               </div>
+              <VisionFieldPreview className="mt-3 max-w-xs" tier={t.tier} label={t.title} />
               <div className="mt-3 grid gap-2 md:grid-cols-4">
                 <select
                   className="h-9 rounded-md border border-border bg-background px-2 text-xs md:col-span-2"
