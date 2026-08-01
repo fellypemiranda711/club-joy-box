@@ -35,6 +35,32 @@ function LabsPage() {
   const quotes = useAdminQuotes(isAdmin);
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyForm);
+  const [lensForm, setLensForm] = useState(emptyLensForm);
+
+  const createLens = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("lab_lens_products").insert({
+        lab_id: lensForm.lab_id,
+        name: lensForm.name.trim(),
+        lens_type: lensForm.lens_type.trim() || null,
+        refraction_index: lensForm.refraction_index.trim() || null,
+        treatments: lensForm.treatments
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+        cost_cents: parseBRLToCents(lensForm.cost) ?? 0,
+        price_cents: parseBRLToCents(lensForm.price) ?? 0,
+        notes: lensForm.notes.trim() || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lente adicionada à tabela.");
+      setLensForm({ ...emptyLensForm, lab_id: lensForm.lab_id });
+      queryClient.invalidateQueries({ queryKey: ["admin-lens-products"] });
+    },
+    onError: () => toast.error("Não foi possível salvar a lente."),
+  });
 
   const createLab = useMutation({
     mutationFn: async () => {
