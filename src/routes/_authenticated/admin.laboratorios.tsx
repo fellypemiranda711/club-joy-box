@@ -121,6 +121,78 @@ function LabsPage() {
         </div>
       </form>
 
+      <form
+        className="mt-6 grid gap-3 rounded-2xl border border-border p-5 sm:grid-cols-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!lensForm.lab_id) {
+            toast.error("Selecione o laboratório.");
+            return;
+          }
+          if (lensForm.name.trim().length < 2) {
+            toast.error("Informe o nome da lente.");
+            return;
+          }
+          createLens.mutate();
+        }}
+      >
+        <div className="sm:col-span-3">
+          <h2 className="font-display text-lg font-semibold">Cadastrar lente</h2>
+          <p className="text-sm text-muted-foreground">
+            As lentes cadastradas aqui aparecem na Tabela de lentes e nos orçamentos.
+          </p>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Laboratório</Label>
+          <select
+            className="h-10 w-full rounded-md border border-border bg-background px-2 text-sm"
+            value={lensForm.lab_id}
+            onChange={(e) => setLensForm({ ...lensForm, lab_id: e.target.value })}
+          >
+            <option value="">Selecione</option>
+            {labs.data?.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Field label="Nome da lente" value={lensForm.name} onChange={(v) => setLensForm({ ...lensForm, name: v })} />
+        <Field
+          label="Tipo (visão simples, multifocal...)"
+          value={lensForm.lens_type}
+          onChange={(v) => setLensForm({ ...lensForm, lens_type: v })}
+        />
+        <Field
+          label="Índice (1.56, 1.67...)"
+          value={lensForm.refraction_index}
+          onChange={(v) => setLensForm({ ...lensForm, refraction_index: v })}
+        />
+        <Field
+          label="Tratamentos (separados por vírgula)"
+          value={lensForm.treatments}
+          onChange={(v) => setLensForm({ ...lensForm, treatments: v })}
+        />
+        <Field
+          label="Custo do laboratório (R$)"
+          value={lensForm.cost}
+          onChange={(v) => setLensForm({ ...lensForm, cost: v })}
+        />
+        <Field
+          label="Preço ao associado (R$)"
+          value={lensForm.price}
+          onChange={(v) => setLensForm({ ...lensForm, price: v })}
+        />
+        <Field label="Observações" value={lensForm.notes} onChange={(v) => setLensForm({ ...lensForm, notes: v })} />
+        <div className="flex items-end sm:col-span-3">
+          <Button type="submit" disabled={createLens.isPending}>
+            Adicionar lente
+          </Button>
+        </div>
+      </form>
+
+
+
       <div className="mt-6 space-y-3">
         {labs.data?.map((l) => {
           const labQuotes = quotes.data?.filter((q) => q.lab_id === l.id) ?? [];
