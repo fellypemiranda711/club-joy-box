@@ -228,6 +228,73 @@ export type Database = {
           },
         ]
       }
+      quote_options: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          lab_id: string | null
+          lens_product_id: string | null
+          market_price_cents: number
+          member_price_cents: number
+          quote_id: string
+          selected: boolean
+          tier: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          lab_id?: string | null
+          lens_product_id?: string | null
+          market_price_cents?: number
+          member_price_cents?: number
+          quote_id: string
+          selected?: boolean
+          tier: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          lab_id?: string | null
+          lens_product_id?: string | null
+          market_price_cents?: number
+          member_price_cents?: number
+          quote_id?: string
+          selected?: boolean
+          tier?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_options_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_options_lens_product_id_fkey"
+            columns: ["lens_product_id"]
+            isOneToOne: false
+            referencedRelation: "lab_lens_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_options_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           admin_notes: string | null
@@ -382,6 +449,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      choose_quote_option: { Args: { _option_id: string }; Returns: undefined }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
