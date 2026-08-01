@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
+import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
+
 import { Button } from "@/components/ui/button";
 import {
   useAdminGate,
@@ -156,6 +158,16 @@ function OrcamentosPage() {
                   {selectedLens.treatments.length > 0 && ` · ${selectedLens.treatments.join(", ")}`}
                 </p>
               )}
+
+              <QuoteOptionsEditor
+                quoteId={q.id}
+                labId={q.lab_id}
+                patientName={q.patient_name}
+                memberName={profile?.full_name ?? null}
+                phoneDigits={phoneDigits}
+                lensProducts={lensProducts.data ?? []}
+              />
+
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {q.prescription_path && (

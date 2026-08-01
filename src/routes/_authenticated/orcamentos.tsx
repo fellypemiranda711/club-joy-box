@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 import { MeasurementDialog } from "@/components/member/MeasurementDialog";
+import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
+
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
@@ -276,15 +278,22 @@ function OrcamentosPage() {
                     Orçamento: R$ {(q.quoted_amount_cents / 100).toFixed(2).replace(".", ",")}
                   </p>
                 )}
+                <QuoteOptionsPicker
+                  quoteId={q.id}
+                  canChoose={["received", "quoting", "quoted"].includes(q.status)}
+                  {...(user ? { userId: user.id } : {})}
+                />
                 {q.status === "quoted" && (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      disabled={respond.isPending}
-                      onClick={() => respond.mutate({ id: q.id, decision: "approved" })}
-                    >
-                      Aprovar orçamento
-                    </Button>
+                    {q.quoted_amount_cents != null && (
+                      <Button
+                        size="sm"
+                        disabled={respond.isPending}
+                        onClick={() => respond.mutate({ id: q.id, decision: "approved" })}
+                      >
+                        Aprovar orçamento
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"
@@ -295,6 +304,8 @@ function OrcamentosPage() {
                     </Button>
                   </div>
                 )}
+
+
                 {(q.status === "approved" || q.status === "completed") && user && (
                   <div className="mt-3 space-y-2">
                     <p className="text-muted-foreground">
