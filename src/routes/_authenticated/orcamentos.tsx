@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -14,9 +14,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
+import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
+import { confirmQuotePayment } from "@/utils/quote-payment.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
+  validateSearch: (search: Record<string, unknown>): { quote_session?: string } =>
+    typeof search["quote_session"] === "string"
+      ? { quote_session: search["quote_session"] as string }
+      : {},
   head: () => ({
     meta: [
       { title: "Solicitar orçamento | Vision Club" },
@@ -306,15 +313,19 @@ function OrcamentosPage() {
                 )}
 
 
-                {(q.status === "approved" || q.status === "completed") && user && (
-                  <div className="mt-3 space-y-2">
-                    <p className="text-muted-foreground">
-                      Orçamento aprovado — agora envie as medidas (DP, DNP, altura e ângulo
-                      pantoscópico) por foto.
-                    </p>
-                    <MeasurementDialog quoteId={q.id} userId={user.id} patientName={q.patient_name} />
-                  </div>
-                )}
+                {(q.status === "approved" || q.status === "completed") &&
+                  user &&
+                  (q.payment_status === "paid" ? (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-muted-foreground">
+                        Pagamento confirmado — agora envie as medidas (DP, DNP, altura e ângulo
+                        pantoscópico) por foto.
+                      </p>
+                      <MeasurementDialog quoteId={q.id} userId={user.id} patientName={q.patient_name} />
+                    </div>
+                  ) : (
+                    <QuotePaymentPanel quoteId={q.id} amountCents={q.quoted_amount_cents} />
+                  ))}
               </li>
             ))}
           </ul>
