@@ -304,10 +304,13 @@ export type Database = {
           lab_id: string | null
           lens_type: string | null
           notes: string | null
+          paid_at: string | null
           patient_name: string
+          payment_status: string
           prescription_path: string | null
           quoted_amount_cents: number | null
           status: string
+          stripe_session_id: string | null
           treatments: string[]
           updated_at: string
           user_id: string
@@ -320,10 +323,13 @@ export type Database = {
           lab_id?: string | null
           lens_type?: string | null
           notes?: string | null
+          paid_at?: string | null
           patient_name: string
+          payment_status?: string
           prescription_path?: string | null
           quoted_amount_cents?: number | null
           status?: string
+          stripe_session_id?: string | null
           treatments?: string[]
           updated_at?: string
           user_id: string
@@ -336,10 +342,13 @@ export type Database = {
           lab_id?: string | null
           lens_type?: string | null
           notes?: string | null
+          paid_at?: string | null
           patient_name?: string
+          payment_status?: string
           prescription_path?: string | null
           quoted_amount_cents?: number | null
           status?: string
+          stripe_session_id?: string | null
           treatments?: string[]
           updated_at?: string
           user_id?: string
