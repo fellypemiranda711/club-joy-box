@@ -187,6 +187,7 @@ export function QuoteOptionsEditor(props: {
                 </span>
                 <span>{t.description}</span>
               </div>
+              <VisionFieldPreview className="mt-3 max-w-xs" tier={t.tier} label={t.title} />
               <div className="mt-3 grid gap-2 md:grid-cols-4">
                 <select
                   className="h-9 rounded-md border border-border bg-background px-2 text-xs md:col-span-2"
