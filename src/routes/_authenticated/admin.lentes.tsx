@@ -33,6 +33,7 @@ function LensTablePage() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyForm);
   const [labFilter, setLabFilter] = useState("");
+  const [search, setSearch] = useState("");
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-lens-products"] });
 
