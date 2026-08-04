@@ -228,6 +228,47 @@ export type Database = {
           },
         ]
       }
+      quote_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_admin: boolean
+          quote_id: string
+          read_at: string | null
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          quote_id: string
+          read_at?: string | null
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          quote_id?: string
+          read_at?: string | null
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_messages_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_options: {
         Row: {
           created_at: string
