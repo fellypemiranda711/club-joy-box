@@ -94,7 +94,7 @@ function SuportePage() {
     }
     return [...map.entries()]
       .map(([quoteId, msgs]) => {
-        const last = msgs[msgs.length - 1];
+        const last = msgs[msgs.length - 1]!;
         const quote = quotes.data?.find((q) => q.id === quoteId);
         return {
           quoteId,
