@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
 import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
+import { QuoteChat } from "@/components/chat/QuoteChat";
+import { useSession } from "@/hooks/use-session";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +27,7 @@ const PENDING_STATUSES = ["received", "quoting", "quoted"];
 
 function OrcamentosPage() {
   const { isAdmin } = useAdminGate();
+  const { user: adminUser } = useSession();
   const quotes = useAdminQuotes(isAdmin);
   const profiles = useAdminProfiles(isAdmin);
   const labs = useAdminLabs(isAdmin);
@@ -167,6 +170,8 @@ function OrcamentosPage() {
                 phoneDigits={phoneDigits}
                 lensProducts={lensProducts.data ?? []}
               />
+
+              {adminUser && <QuoteChat quoteId={q.id} userId={adminUser.id} asAdmin title="Dúvidas do associado" />}
 
 
               <div className="mt-3 flex flex-wrap gap-2">
