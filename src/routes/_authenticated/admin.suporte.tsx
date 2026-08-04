@@ -153,11 +153,71 @@ function SuportePage() {
 
   return (
     <AdminPage title="Suporte" description="Fila de atendimento gerada automaticamente a partir dos dados do clube.">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <Stat label="Chamados abertos" value={String(tickets.length)} />
         <Stat label="Prioridade alta" value={String(high)} />
+        <Stat label="Mensagens não lidas" value={String(unreadTotal)} />
         <Stat label="Associados" value={String(profiles.data?.length ?? 0)} />
       </div>
+
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold">Conversas com associados</h2>
+        <p className="text-xs text-muted-foreground">
+          Todas as dúvidas enviadas nos orçamentos chegam aqui — responda direto por esta aba.
+        </p>
+
+        <div className="mt-3 space-y-3">
+          {messages.isLoading && <p className="text-xs text-muted-foreground">Carregando conversas...</p>}
+          {threads.map((t) => {
+            const profile = profiles.data?.find((p) => p.id === t.quote?.user_id);
+            const digits = toE164Digits(profile?.phone);
+            return (
+              <div key={t.quoteId} className="rounded-xl border border-border p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">
+                      {profile?.full_name || "Associado"}
+                      {t.quote?.patient_name ? ` · ${t.quote.patient_name}` : ""}
+                      {t.unread > 0 && (
+                        <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-[10px] text-primary-foreground">
+                          {t.unread} nova(s)
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t.last.is_admin ? "Você: " : ""}
+                      {t.last.content} ·{" "}
+                      {new Date(t.last.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {t.unread > 0 && (
+                      <Button size="sm" variant="ghost" onClick={() => markRead.mutate(t.quoteId)}>
+                        Marcar como lida
+                      </Button>
+                    )}
+                    {digits && (
+                      <Button size="sm" variant="outline" asChild>
+                        <a
+                          href={buildWhatsappUrl(digits, "Olá! Aqui é da equipe Vision Club, tudo bem? 👋")}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          WhatsApp
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {user && <QuoteChat quoteId={t.quoteId} userId={user.id} asAdmin title="Abrir conversa" />}
+              </div>
+            );
+          })}
+          {!messages.isLoading && threads.length === 0 && <Empty>Nenhuma conversa iniciada pelos associados.</Empty>}
+        </div>
+      </section>
+
 
       <div className="mt-6 space-y-3">
         {tickets.map((t) => {
