@@ -27,6 +27,7 @@ const PENDING_STATUSES = ["received", "quoting", "quoted"];
 
 function OrcamentosPage() {
   const { isAdmin } = useAdminGate();
+  const { user: adminUser } = useSession();
   const quotes = useAdminQuotes(isAdmin);
   const profiles = useAdminProfiles(isAdmin);
   const labs = useAdminLabs(isAdmin);
