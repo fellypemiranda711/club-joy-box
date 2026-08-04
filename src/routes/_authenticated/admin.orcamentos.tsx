@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
 import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
 import { QuoteChat } from "@/components/chat/QuoteChat";
+import { useSession } from "@/hooks/use-session";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -168,6 +169,8 @@ function OrcamentosPage() {
                 phoneDigits={phoneDigits}
                 lensProducts={lensProducts.data ?? []}
               />
+
+              {adminUser && <QuoteChat quoteId={q.id} userId={adminUser.id} asAdmin title="Dúvidas do associado" />}
 
 
               <div className="mt-3 flex flex-wrap gap-2">
