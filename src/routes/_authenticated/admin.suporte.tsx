@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdminPage, Empty, Stat } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/button";
+import { QuoteChat } from "@/components/chat/QuoteChat";
+import { supabase } from "@/integrations/supabase/client";
 import {
   useAdminGate,
   useAdminMeasurements,
@@ -9,6 +13,30 @@ import {
   useAdminSubs,
 } from "@/hooks/use-admin-data";
 import { buildWhatsappUrl, toE164Digits } from "@/lib/whatsapp";
+
+type ChatMessage = {
+  id: string;
+  quote_id: string;
+  is_admin: boolean;
+  content: string;
+  read_at: string | null;
+  created_at: string;
+};
+
+function useSupportThreads(enabled: boolean) {
+  return useQuery({
+    queryKey: ["admin-quote-messages"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quote_messages")
+        .select("id, quote_id, is_admin, content, read_at, created_at")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as ChatMessage[];
+    },
+  });
+}
 
 export const Route = createFileRoute("/_authenticated/admin/suporte")({
   component: SuportePage,
