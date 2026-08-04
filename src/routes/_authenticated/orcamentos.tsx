@@ -15,6 +15,7 @@ import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
 import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
+import { QuoteChat } from "@/components/chat/QuoteChat";
 import { confirmQuotePayment } from "@/utils/quote-payment.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 
@@ -313,6 +314,7 @@ function OrcamentosPage() {
                   canChoose={["received", "quoting", "quoted"].includes(q.status)}
                   {...(user ? { userId: user.id } : {})}
                 />
+                {user && <QuoteChat quoteId={q.id} userId={user.id} />}
                 {q.status === "quoted" && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {q.quoted_amount_cents != null && (

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
 import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
+import { QuoteChat } from "@/components/chat/QuoteChat";
 
 import { Button } from "@/components/ui/button";
 import {
