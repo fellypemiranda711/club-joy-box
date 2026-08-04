@@ -51,11 +51,63 @@ type Ticket = {
 };
 
 function SuportePage() {
-  const { isAdmin } = useAdminGate();
+  const { user, isAdmin } = useAdminGate();
+  const queryClient = useQueryClient();
   const subs = useAdminSubs(isAdmin);
   const quotes = useAdminQuotes(isAdmin);
   const profiles = useAdminProfiles(isAdmin);
   const measurements = useAdminMeasurements(isAdmin);
+  const messages = useSupportThreads(isAdmin);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    const channel = supabase
+      .channel("admin-support-messages")
+      .on("postgres_changes", { event: "*", schema: "public", table: "quote_messages" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-quote-messages"] });
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isAdmin, queryClient]);
+
+  const markRead = useMutation({
+    mutationFn: async (quoteId: string) => {
+      const { error } = await supabase
+        .from("quote_messages")
+        .update({ read_at: new Date().toISOString() })
+        .eq("quote_id", quoteId)
+        .eq("is_admin", false)
+        .is("read_at", null);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-quote-messages"] }),
+  });
+
+  const threads = (() => {
+    const map = new Map<string, ChatMessage[]>();
+    for (const m of messages.data ?? []) {
+      const arr = map.get(m.quote_id) ?? [];
+      arr.push(m);
+      map.set(m.quote_id, arr);
+    }
+    return [...map.entries()]
+      .map(([quoteId, msgs]) => {
+        const last = msgs[msgs.length - 1];
+        const quote = quotes.data?.find((q) => q.id === quoteId);
+        return {
+          quoteId,
+          last,
+          quote,
+          unread: msgs.filter((m) => !m.is_admin && !m.read_at).length,
+        };
+      })
+      .sort((a, b) => new Date(b.last.created_at).getTime() - new Date(a.last.created_at).getTime());
+  })();
+
+  const unreadTotal = threads.reduce((acc, t) => acc + t.unread, 0);
+
 
   const tickets: Ticket[] = [];
 
