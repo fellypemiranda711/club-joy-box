@@ -237,7 +237,42 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
             <div ref={bottomRef} />
           </div>
 
+          {file && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-xs">
+              <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              <span className="truncate">{file.name}</span>
+              <button
+                type="button"
+                className="ml-auto text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  setFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                aria-label="Remover anexo"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="mt-3 flex items-end gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+            <Button
+              size="icon"
+              variant="outline"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={send.isPending}
+              aria-label="Anexar arquivo ou foto"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
             <Textarea
               rows={2}
               maxLength={1500}
@@ -251,9 +286,15 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
                 }
               }}
             />
-            <Button size="icon" onClick={submit} disabled={send.isPending || !text.trim()} aria-label="Enviar mensagem">
+            <Button
+              size="icon"
+              onClick={submit}
+              disabled={send.isPending || (!text.trim() && !file)}
+              aria-label="Enviar mensagem"
+            >
               <Send className="h-4 w-4" />
             </Button>
+
           </div>
         </div>
       )}
