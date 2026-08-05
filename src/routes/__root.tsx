@@ -17,7 +17,7 @@ import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 
 function isAdminRoute(pathname: string) {
-  return pathname === "/admin-login" || pathname.startsWith("/admin");
+  return pathname === "/admin-login" || pathname.startsWith("/admin") || pathname === "/lab-login" || pathname.startsWith("/lab");
 }
 
 function NotFoundComponent() {
