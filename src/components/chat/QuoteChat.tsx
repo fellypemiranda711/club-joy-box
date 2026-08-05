@@ -101,7 +101,7 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
 
       {open && (
         <div className="border-t border-border p-4">
-          <div className="max-h-72 space-y-3 overflow-y-auto pr-1">
+          <div className="max-h-80 overflow-y-auto rounded-xl bg-secondary/50 p-3">
             {list.isLoading && <p className="text-xs text-muted-foreground">Carregando conversa...</p>}
             {list.data?.length === 0 && (
               <p className="text-xs text-muted-foreground">
