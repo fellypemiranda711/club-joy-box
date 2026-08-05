@@ -80,7 +80,9 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
     queryFn: async () => {
       const { data, error } = await supabase
         .from("quote_messages")
-        .select("id, quote_id, sender_id, is_admin, content, created_at")
+        .select(
+          "id, quote_id, sender_id, is_admin, content, created_at, attachment_path, attachment_name, attachment_type",
+        )
         .eq("quote_id", quoteId)
         .order("created_at", { ascending: true });
       if (error) throw error;
