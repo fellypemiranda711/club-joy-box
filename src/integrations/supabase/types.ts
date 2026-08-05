@@ -116,6 +116,7 @@ export type Database = {
           district: string | null
           full_name: string
           id: string
+          lab_id: string | null
           number: string | null
           phone: string | null
           state: string | null
@@ -131,6 +132,7 @@ export type Database = {
           district?: string | null
           full_name?: string
           id: string
+          lab_id?: string | null
           number?: string | null
           phone?: string | null
           state?: string | null
@@ -146,13 +148,22 @@ export type Database = {
           district?: string | null
           full_name?: string
           id?: string
+          lab_id?: string | null
           number?: string | null
           phone?: string | null
           state?: string | null
           street?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quote_measurements: {
         Row: {
@@ -556,6 +567,7 @@ export type Database = {
     }
     Functions: {
       choose_quote_option: { Args: { _option_id: string }; Returns: undefined }
+      get_user_lab_id: { Args: never; Returns: string }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
@@ -577,7 +589,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "member"
+      app_role: "admin" | "member" | "lab"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -705,7 +717,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "member"],
+      app_role: ["admin", "member", "lab"],
     },
   },
 } as const
