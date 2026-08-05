@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
+import { OrderTrackingEditor } from "@/components/admin/OrderTrackingEditor";
 import { Button } from "@/components/ui/button";
 import {
   useAdminGate,
