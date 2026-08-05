@@ -242,6 +242,15 @@ function PedidosPage() {
                 ))}
               </div>
 
+              <OrderTrackingEditor
+                quoteId={q.id}
+                status={q.fulfillment_status}
+                trackingCode={q.tracking_code}
+                carrier={q.carrier}
+                estimatedDelivery={q.estimated_delivery}
+                adminId={user?.id}
+              />
+
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
                   size="sm"
