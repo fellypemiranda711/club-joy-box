@@ -216,6 +216,9 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
                         </p>
                       )}
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                      {m.attachment_path && (
+                        <Attachment path={m.attachment_path} name={m.attachment_name} type={m.attachment_type} />
+                      )}
                       <p
                         className={
                           mine
