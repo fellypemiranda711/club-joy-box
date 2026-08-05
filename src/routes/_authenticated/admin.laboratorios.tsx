@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAdminGate, useAdminLabs, useAdminQuotes } from "@/hooks/use-admin-data";
 import { brl, commissionCents, isRevenueQuote } from "@/lib/admin";
 import { parseBRLToCents } from "@/lib/whatsapp";
+import { listLabUsers, inviteLabUser, revokeLabUser } from "@/lib/lab-team.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/laboratorios")({
   component: LabsPage,
