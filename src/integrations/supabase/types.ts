@@ -348,8 +348,11 @@ export type Database = {
       quote_requests: {
         Row: {
           admin_notes: string | null
+          carrier: string | null
           commission_cents: number | null
           created_at: string
+          estimated_delivery: string | null
+          fulfillment_status: string
           id: string
           lab_id: string | null
           lens_type: string | null
@@ -361,14 +364,18 @@ export type Database = {
           quoted_amount_cents: number | null
           status: string
           stripe_session_id: string | null
+          tracking_code: string | null
           treatments: string[]
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_notes?: string | null
+          carrier?: string | null
           commission_cents?: number | null
           created_at?: string
+          estimated_delivery?: string | null
+          fulfillment_status?: string
           id?: string
           lab_id?: string | null
           lens_type?: string | null
@@ -380,14 +387,18 @@ export type Database = {
           quoted_amount_cents?: number | null
           status?: string
           stripe_session_id?: string | null
+          tracking_code?: string | null
           treatments?: string[]
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_notes?: string | null
+          carrier?: string | null
           commission_cents?: number | null
           created_at?: string
+          estimated_delivery?: string | null
+          fulfillment_status?: string
           id?: string
           lab_id?: string | null
           lens_type?: string | null
@@ -399,6 +410,7 @@ export type Database = {
           quoted_amount_cents?: number | null
           status?: string
           stripe_session_id?: string | null
+          tracking_code?: string | null
           treatments?: string[]
           updated_at?: string
           user_id?: string
@@ -409,6 +421,41 @@ export type Database = {
             columns: ["lab_id"]
             isOneToOne: false
             referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_status_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          quote_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          quote_id: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          quote_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_status_events_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
             referencedColumns: ["id"]
           },
         ]

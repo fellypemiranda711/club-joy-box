@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
 import { MeasurementDialog } from "@/components/member/MeasurementDialog";
+import { OrderTracking } from "@/components/member/OrderTracking";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
 import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
 import { QuoteChat } from "@/components/chat/QuoteChat";
@@ -347,6 +348,13 @@ function OrcamentosPage() {
                         pantoscópico) por foto.
                       </p>
                       <MeasurementDialog quoteId={q.id} userId={user.id} patientName={q.patient_name} />
+                      <OrderTracking
+                        quoteId={q.id}
+                        status={q.fulfillment_status}
+                        trackingCode={q.tracking_code}
+                        carrier={q.carrier}
+                        estimatedDelivery={q.estimated_delivery}
+                      />
                     </div>
                   ) : (
                     <QuotePaymentPanel quoteId={q.id} amountCents={q.quoted_amount_cents} />

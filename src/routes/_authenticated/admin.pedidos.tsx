@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
+import { OrderTrackingEditor } from "@/components/admin/OrderTrackingEditor";
 import { Button } from "@/components/ui/button";
 import {
   useAdminGate,
@@ -241,6 +242,15 @@ function PedidosPage() {
                   </div>
                 ))}
               </div>
+
+              <OrderTrackingEditor
+                quoteId={q.id}
+                status={q.fulfillment_status}
+                trackingCode={q.tracking_code}
+                carrier={q.carrier}
+                estimatedDelivery={q.estimated_delivery}
+                adminId={user?.id}
+              />
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
