@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MessageCircle, Send } from "lucide-react";
+import { FileText, MessageCircle, Paperclip, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+
+const BUCKET = "chat-attachments";
+const MAX_FILE_MB = 10;
 
 type QuoteMessage = {
   id: string;
@@ -13,7 +16,46 @@ type QuoteMessage = {
   is_admin: boolean;
   content: string;
   created_at: string;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_type: string | null;
 };
+
+function Attachment({ path, name, type }: { path: string; name: string | null; type: string | null }) {
+  const isImage = (type ?? "").startsWith("image/");
+  const { data: url } = useQuery({
+    queryKey: ["chat-attachment", path],
+    staleTime: 1000 * 60 * 30,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+  });
+
+  if (!url) return <p className="mt-1 text-[10px] opacity-70">Carregando anexo...</p>;
+
+  if (isImage) {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" className="mt-1 block">
+        <img src={url} alt={name ?? "Anexo enviado no chat"} className="max-h-56 rounded-lg object-cover" />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="mt-1 flex items-center gap-2 rounded-lg bg-background/40 px-2 py-1.5 underline-offset-2 hover:underline"
+    >
+      <FileText className="h-4 w-4 shrink-0" />
+      <span className="truncate">{name ?? "Arquivo"}</span>
+    </a>
+  );
+}
+
 
 type Props = {
   quoteId: string;
@@ -27,6 +69,8 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const queryKey = useMemo(() => ["quote-messages", quoteId], [quoteId]);
 
@@ -36,7 +80,9 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
     queryFn: async () => {
       const { data, error } = await supabase
         .from("quote_messages")
-        .select("id, quote_id, sender_id, is_admin, content, created_at")
+        .select(
+          "id, quote_id, sender_id, is_admin, content, created_at, attachment_path, attachment_name, attachment_type",
+        )
         .eq("quote_id", quoteId)
         .order("created_at", { ascending: true });
       if (error) throw error;
@@ -66,24 +112,49 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
   }, [open, list.data?.length]);
 
   const send = useMutation({
-    mutationFn: async (content: string) => {
-      const { error } = await supabase
-        .from("quote_messages")
-        .insert({ quote_id: quoteId, sender_id: userId, is_admin: asAdmin, content });
+    mutationFn: async ({ content, file }: { content: string; file: File | null }) => {
+      let attachment: { path: string; name: string; type: string } | null = null;
+
+      if (file) {
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+          throw new Error(`Arquivo maior que ${MAX_FILE_MB}MB.`);
+        }
+        const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
+        const path = `${quoteId}/${crypto.randomUUID()}-${safeName}`;
+        const { error: upErr } = await supabase.storage
+          .from(BUCKET)
+          .upload(path, file, { contentType: file.type || "application/octet-stream" });
+        if (upErr) throw upErr;
+        attachment = { path, name: file.name.slice(0, 120), type: file.type || "application/octet-stream" };
+      }
+
+      const { error } = await supabase.from("quote_messages").insert({
+        quote_id: quoteId,
+        sender_id: userId,
+        is_admin: asAdmin,
+        content: content || (attachment ? `📎 ${attachment.name}` : ""),
+        attachment_path: attachment?.path ?? null,
+        attachment_name: attachment?.name ?? null,
+        attachment_type: attachment?.type ?? null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
       setText("");
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       queryClient.invalidateQueries({ queryKey });
     },
-    onError: () => toast.error("Não foi possível enviar a mensagem."),
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error && e.message ? e.message : "Não foi possível enviar a mensagem."),
   });
 
   const submit = () => {
     const content = text.trim();
-    if (!content) return;
-    send.mutate(content.slice(0, 1500));
+    if (!content && !file) return;
+    send.mutate({ content: content.slice(0, 1500), file });
   };
+
 
   return (
     <div className="mt-3 rounded-xl border border-border">
@@ -145,6 +216,9 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
                         </p>
                       )}
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                      {m.attachment_path && (
+                        <Attachment path={m.attachment_path} name={m.attachment_name} type={m.attachment_type} />
+                      )}
                       <p
                         className={
                           mine
@@ -163,7 +237,42 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
             <div ref={bottomRef} />
           </div>
 
+          {file && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-secondary/50 px-3 py-2 text-xs">
+              <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              <span className="truncate">{file.name}</span>
+              <button
+                type="button"
+                className="ml-auto text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  setFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                aria-label="Remover anexo"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
           <div className="mt-3 flex items-end gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+            <Button
+              size="icon"
+              variant="outline"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={send.isPending}
+              aria-label="Anexar arquivo ou foto"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
             <Textarea
               rows={2}
               maxLength={1500}
@@ -177,9 +286,15 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
                 }
               }}
             />
-            <Button size="icon" onClick={submit} disabled={send.isPending || !text.trim()} aria-label="Enviar mensagem">
+            <Button
+              size="icon"
+              onClick={submit}
+              disabled={send.isPending || (!text.trim() && !file)}
+              aria-label="Enviar mensagem"
+            >
               <Send className="h-4 w-4" />
             </Button>
+
           </div>
         </div>
       )}
