@@ -69,6 +69,8 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const queryKey = useMemo(() => ["quote-messages", quoteId], [quoteId]);
 
