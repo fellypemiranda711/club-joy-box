@@ -313,11 +313,11 @@ function FulfillmentControls({ order }: { order: LabOrder }) {
       updateLabFulfillment({
         data: {
           quoteId: order.id,
-          status: vars.status,
+          ...(vars.status ? { status: vars.status } : {}),
           trackingCode: code,
           carrier,
           estimatedDelivery: eta,
-          note: vars.note,
+          ...(vars.note ? { note: vars.note } : {}),
         },
       }),
     onSuccess: () => {

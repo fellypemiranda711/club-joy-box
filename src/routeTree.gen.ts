@@ -16,11 +16,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as LabLoginRouteImport } from './routes/lab-login'
 import { Route as PlanosRouteImport } from './routes/planos'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAreaRouteImport } from './routes/_authenticated/area'
 import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticated/assinar'
+import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -72,6 +74,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabLoginRoute = LabLoginRouteImport.update({
+  id: '/lab-login',
+  path: '/lab-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlanosRoute = PlanosRouteImport.update({
   id: '/planos',
   path: '/planos',
@@ -95,6 +102,11 @@ const AuthenticatedAreaRoute = AuthenticatedAreaRouteImport.update({
 const AuthenticatedAssinarRoute = AuthenticatedAssinarRouteImport.update({
   id: '/assinar',
   path: '/assinar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOrcamentosRoute = AuthenticatedOrcamentosRouteImport.update({
@@ -197,11 +209,13 @@ export interface FileRoutesByFullPath {
   '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
+  '/lab-login': typeof LabLoginRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/area': typeof AuthenticatedAreaRoute
   '/assinar': typeof AuthenticatedAssinarRoute
+  '/lab': typeof AuthenticatedLabRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
@@ -226,10 +240,12 @@ export interface FileRoutesByTo {
   '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
+  '/lab-login': typeof LabLoginRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
   '/area': typeof AuthenticatedAreaRoute
   '/assinar': typeof AuthenticatedAssinarRoute
+  '/lab': typeof AuthenticatedLabRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
@@ -256,11 +272,13 @@ export interface FileRoutesById {
   '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/faq': typeof FaqRoute
+  '/lab-login': typeof LabLoginRoute
   '/planos': typeof PlanosRoute
   '/sobre': typeof SobreRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/area': typeof AuthenticatedAreaRoute
   '/_authenticated/assinar': typeof AuthenticatedAssinarRoute
+  '/_authenticated/lab': typeof AuthenticatedLabRoute
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
@@ -287,11 +305,13 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/contato'
     | '/faq'
+    | '/lab-login'
     | '/planos'
     | '/sobre'
     | '/admin'
     | '/area'
     | '/assinar'
+    | '/lab'
     | '/orcamentos'
     | '/perfil'
     | '/admin/assinaturas'
@@ -316,10 +336,12 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/contato'
     | '/faq'
+    | '/lab-login'
     | '/planos'
     | '/sobre'
     | '/area'
     | '/assinar'
+    | '/lab'
     | '/orcamentos'
     | '/perfil'
     | '/admin/assinaturas'
@@ -345,11 +367,13 @@ export interface FileRouteTypes {
     | '/como-funciona'
     | '/contato'
     | '/faq'
+    | '/lab-login'
     | '/planos'
     | '/sobre'
     | '/_authenticated/admin'
     | '/_authenticated/area'
     | '/_authenticated/assinar'
+    | '/_authenticated/lab'
     | '/_authenticated/orcamentos'
     | '/_authenticated/perfil'
     | '/_authenticated/admin/assinaturas'
@@ -376,6 +400,7 @@ export interface RootRouteChildren {
   ComoFuncionaRoute: typeof ComoFuncionaRoute
   ContatoRoute: typeof ContatoRoute
   FaqRoute: typeof FaqRoute
+  LabLoginRoute: typeof LabLoginRoute
   PlanosRoute: typeof PlanosRoute
   SobreRoute: typeof SobreRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -432,6 +457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab-login': {
+      id: '/lab-login'
+      path: '/lab-login'
+      fullPath: '/lab-login'
+      preLoaderRoute: typeof LabLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/planos': {
       id: '/planos'
       path: '/planos'
@@ -465,6 +497,13 @@ declare module '@tanstack/react-router' {
       path: '/assinar'
       fullPath: '/assinar'
       preLoaderRoute: typeof AuthenticatedAssinarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lab': {
+      id: '/_authenticated/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof AuthenticatedLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orcamentos': {
@@ -621,6 +660,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAreaRoute: typeof AuthenticatedAreaRoute
   AuthenticatedAssinarRoute: typeof AuthenticatedAssinarRoute
+  AuthenticatedLabRoute: typeof AuthenticatedLabRoute
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
 }
@@ -629,6 +669,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAreaRoute: AuthenticatedAreaRoute,
   AuthenticatedAssinarRoute: AuthenticatedAssinarRoute,
+  AuthenticatedLabRoute: AuthenticatedLabRoute,
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
 }
@@ -644,6 +685,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComoFuncionaRoute: ComoFuncionaRoute,
   ContatoRoute: ContatoRoute,
   FaqRoute: FaqRoute,
+  LabLoginRoute: LabLoginRoute,
   PlanosRoute: PlanosRoute,
   SobreRoute: SobreRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
