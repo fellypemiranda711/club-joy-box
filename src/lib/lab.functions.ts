@@ -179,7 +179,12 @@ export const updateLabFulfillment = createServerFn({ method: "POST" })
     if (qErr || !quote) throw new Error("Pedido não encontrado.");
     if (quote.lab_id !== labId) throw new Error("Este pedido não pertence ao seu laboratório.");
 
-    const update: Record<string, unknown> = {};
+    const update: {
+      fulfillment_status?: string;
+      tracking_code?: string | null;
+      carrier?: string | null;
+      estimated_delivery?: string | null;
+    } = {};
     if (data.status) update.fulfillment_status = data.status;
     if (data.trackingCode !== undefined) update.tracking_code = data.trackingCode.trim() || null;
     if (data.carrier !== undefined) update.carrier = data.carrier.trim() || null;
