@@ -204,31 +204,125 @@ function LabsPage() {
             .filter((q) => isRevenueQuote(q.status))
             .reduce((acc, q) => acc + commissionCents(q, labs.data ?? []), 0);
           return (
-            <div
-              key={l.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4 text-sm"
-            >
-              <div>
-                <p className="font-medium">
-                  {l.name} {!l.active && <span className="text-xs text-muted-foreground">(inativo)</span>}
-                </p>
-                <p className="text-muted-foreground">
-                  {l.contact_email || "sem e-mail"} · {l.city ? `${l.city}/${l.state ?? ""}` : "sem cidade"} · comissão{" "}
-                  {l.commission_percent}%
-                </p>
-                <p className="text-muted-foreground">
-                  {labQuotes.length} pedido(s) · faturado {brl(revenue)} · comissão {brl(commission)}
-                </p>
+            <div key={l.id} className="rounded-xl border border-border p-4 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-medium">
+                    {l.name} {!l.active && <span className="text-xs text-muted-foreground">(inativo)</span>}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {l.contact_email || "sem e-mail"} · {l.city ? `${l.city}/${l.state ?? ""}` : "sem cidade"} · comissão{" "}
+                    {l.commission_percent}%
+                  </p>
+                  <p className="text-muted-foreground">
+                    {labQuotes.length} pedido(s) · faturado {brl(revenue)} · comissão {brl(commission)}
+                  </p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => toggleActive.mutate({ id: l.id, active: !l.active })}>
+                  {l.active ? "Desativar" : "Ativar"}
+                </Button>
               </div>
-              <Button size="sm" variant="outline" onClick={() => toggleActive.mutate({ id: l.id, active: !l.active })}>
-                {l.active ? "Desativar" : "Ativar"}
-              </Button>
+              <LabUsersSection labId={l.id} />
             </div>
           );
         })}
         {labs.data?.length === 0 && <Empty>Nenhum laboratório cadastrado.</Empty>}
       </div>
     </AdminPage>
+  );
+}
+
+function LabUsersSection({ labId }: { labId: string }) {
+  const queryClient = useQueryClient();
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [tempPassword, setTempPassword] = useState("");
+
+  const { data: users } = useQuery({
+    queryKey: ["lab-users", labId],
+    queryFn: () => listLabUsers({ data: { labId } }),
+  });
+
+  const invite = useMutation({
+    mutationFn: () =>
+      inviteLabUser({ data: { email, fullName, labId, ...(tempPassword ? { tempPassword } : {}) } }),
+    onSuccess: (res) => {
+      toast.success(res.mode === "created" ? "Acesso criado com senha provisória." : "Convite enviado por e-mail.");
+      setEmail("");
+      setFullName("");
+      setTempPassword("");
+      setInviteOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["lab-users", labId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const revoke = useMutation({
+    mutationFn: (userId: string) => revokeLabUser({ data: { userId } }),
+    onSuccess: () => {
+      toast.success("Acesso removido.");
+      queryClient.invalidateQueries({ queryKey: ["lab-users", labId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Usuários do laboratório</p>
+        <Button size="sm" variant="outline" onClick={() => setInviteOpen((v) => !v)}>
+          {inviteOpen ? "Cancelar" : "+ Vincular usuário"}
+        </Button>
+      </div>
+
+      {inviteOpen && (
+        <form
+          className="mt-3 grid gap-2 rounded-lg bg-secondary/40 p-3 sm:grid-cols-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!email.trim() || !fullName.trim()) {
+              toast.error("Informe e-mail e nome.");
+              return;
+            }
+            invite.mutate();
+          }}
+        >
+          <Input className="h-9 text-xs" placeholder="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input className="h-9 text-xs" placeholder="Nome completo" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          <Input
+            className="h-9 text-xs"
+            placeholder="Senha provisória (opcional, min. 8)"
+            value={tempPassword}
+            onChange={(e) => setTempPassword(e.target.value)}
+          />
+          <div className="flex items-end">
+            <Button type="submit" size="sm" disabled={invite.isPending}>
+              {invite.isPending ? "Criando..." : "Criar acesso"}
+            </Button>
+          </div>
+        </form>
+      )}
+
+      <div className="mt-2 space-y-1">
+        {(users ?? []).map((u) => (
+          <div key={u.userId} className="flex items-center justify-between rounded-md px-2 py-1.5 text-xs">
+            <span>
+              {u.fullName || u.email} {u.pending && <span className="text-muted-foreground">(aguardando 1º acesso)</span>}
+            </span>
+            <button
+              onClick={() => revoke.mutate(u.userId)}
+              className="text-muted-foreground transition-colors hover:text-destructive"
+            >
+              Remover
+            </button>
+          </div>
+        ))}
+        {(users ?? []).length === 0 && (
+          <p className="px-2 py-1 text-xs text-muted-foreground">Nenhum usuário vinculado.</p>
+        )}
+      </div>
+    </div>
   );
 }
 
