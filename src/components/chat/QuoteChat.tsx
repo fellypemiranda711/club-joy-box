@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MessageCircle, Send } from "lucide-react";
+import { FileText, MessageCircle, Paperclip, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+
+const BUCKET = "chat-attachments";
+const MAX_FILE_MB = 10;
 
 type QuoteMessage = {
   id: string;
@@ -13,7 +16,46 @@ type QuoteMessage = {
   is_admin: boolean;
   content: string;
   created_at: string;
+  attachment_path: string | null;
+  attachment_name: string | null;
+  attachment_type: string | null;
 };
+
+function Attachment({ path, name, type }: { path: string; name: string | null; type: string | null }) {
+  const isImage = (type ?? "").startsWith("image/");
+  const { data: url } = useQuery({
+    queryKey: ["chat-attachment", path],
+    staleTime: 1000 * 60 * 30,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+  });
+
+  if (!url) return <p className="mt-1 text-[10px] opacity-70">Carregando anexo...</p>;
+
+  if (isImage) {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" className="mt-1 block">
+        <img src={url} alt={name ?? "Anexo enviado no chat"} className="max-h-56 rounded-lg object-cover" />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="mt-1 flex items-center gap-2 rounded-lg bg-background/40 px-2 py-1.5 underline-offset-2 hover:underline"
+    >
+      <FileText className="h-4 w-4 shrink-0" />
+      <span className="truncate">{name ?? "Arquivo"}</span>
+    </a>
+  );
+}
+
 
 type Props = {
   quoteId: string;
