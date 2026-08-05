@@ -110,26 +110,56 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
                   : "Nenhuma mensagem ainda. Escreva sua dúvida e nossa equipe responde por aqui."}
               </p>
             )}
-            {list.data?.map((m) => {
-              const mine = m.sender_id === userId;
+            {list.data?.map((m, i) => {
+              const mine = m.is_admin === asAdmin;
+              const prev = list.data?.[i - 1];
+              const dayLabel = new Date(m.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+              const showDay = !prev || new Date(prev.created_at).toDateString() !== new Date(m.created_at).toDateString();
+              const grouped = prev && prev.is_admin === m.is_admin && !showDay;
               return (
-                <div key={m.id} className={mine ? "flex justify-end" : "flex justify-start"}>
-                  <div
-                    className={
-                      mine
-                        ? "max-w-[85%] rounded-2xl bg-primary px-3 py-2 text-xs text-primary-foreground"
-                        : "max-w-[85%] rounded-2xl bg-secondary px-3 py-2 text-xs text-foreground"
-                    }
-                  >
-                    <p className="whitespace-pre-wrap">{m.content}</p>
-                    <p className={mine ? "mt-1 text-[10px] opacity-70" : "mt-1 text-[10px] text-muted-foreground"}>
-                      {m.is_admin ? "Equipe Vision Club" : "Associado"} ·{" "}
-                      {new Date(m.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
-                    </p>
+                <div key={m.id}>
+                  {showDay && (
+                    <div className="my-2 flex justify-center">
+                      <span className="rounded-full bg-background px-3 py-1 text-[10px] uppercase tracking-wide text-muted-foreground shadow-sm">
+                        {dayLabel}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex ${mine ? "justify-end" : "justify-start"} ${grouped ? "mt-1" : "mt-3"}`}>
+                    <div
+                      className={
+                        mine
+                          ? "max-w-[78%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-xs text-primary-foreground shadow-sm"
+                          : "max-w-[78%] rounded-2xl rounded-bl-sm bg-card px-3 py-2 text-xs text-foreground shadow-sm ring-1 ring-border"
+                      }
+                    >
+                      {!grouped && (
+                        <p
+                          className={
+                            mine
+                              ? "mb-0.5 text-[10px] font-semibold opacity-80"
+                              : "mb-0.5 text-[10px] font-semibold text-muted-foreground"
+                          }
+                        >
+                          {m.is_admin ? "Equipe Vision Club" : "Associado"}
+                        </p>
+                      )}
+                      <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                      <p
+                        className={
+                          mine
+                            ? "mt-1 text-right text-[10px] opacity-70"
+                            : "mt-1 text-right text-[10px] text-muted-foreground"
+                        }
+                      >
+                        {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );
             })}
+
             <div ref={bottomRef} />
           </div>
 
