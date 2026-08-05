@@ -108,24 +108,49 @@ export function QuoteChat({ quoteId, userId, asAdmin = false, title = "Dúvidas 
   }, [open, list.data?.length]);
 
   const send = useMutation({
-    mutationFn: async (content: string) => {
-      const { error } = await supabase
-        .from("quote_messages")
-        .insert({ quote_id: quoteId, sender_id: userId, is_admin: asAdmin, content });
+    mutationFn: async ({ content, file }: { content: string; file: File | null }) => {
+      let attachment: { path: string; name: string; type: string } | null = null;
+
+      if (file) {
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+          throw new Error(`Arquivo maior que ${MAX_FILE_MB}MB.`);
+        }
+        const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
+        const path = `${quoteId}/${crypto.randomUUID()}-${safeName}`;
+        const { error: upErr } = await supabase.storage
+          .from(BUCKET)
+          .upload(path, file, { contentType: file.type || "application/octet-stream" });
+        if (upErr) throw upErr;
+        attachment = { path, name: file.name.slice(0, 120), type: file.type || "application/octet-stream" };
+      }
+
+      const { error } = await supabase.from("quote_messages").insert({
+        quote_id: quoteId,
+        sender_id: userId,
+        is_admin: asAdmin,
+        content: content || (attachment ? `📎 ${attachment.name}` : ""),
+        attachment_path: attachment?.path ?? null,
+        attachment_name: attachment?.name ?? null,
+        attachment_type: attachment?.type ?? null,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
       setText("");
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       queryClient.invalidateQueries({ queryKey });
     },
-    onError: () => toast.error("Não foi possível enviar a mensagem."),
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error && e.message ? e.message : "Não foi possível enviar a mensagem."),
   });
 
   const submit = () => {
     const content = text.trim();
-    if (!content) return;
-    send.mutate(content.slice(0, 1500));
+    if (!content && !file) return;
+    send.mutate({ content: content.slice(0, 1500), file });
   };
+
 
   return (
     <div className="mt-3 rounded-xl border border-border">
