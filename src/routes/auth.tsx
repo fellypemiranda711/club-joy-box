@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({
+    redirect:
+      typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
+        ? search["redirect"]
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Entrar | Vision Club" },
