@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,7 +58,7 @@ function AuthPage() {
 
   const goNext = useCallback(() => {
     if (redirectTo) navigate({ href: redirectTo, replace: true });
-    else navigate({ to: "/area", replace: true });
+    else goNext();
   }, [navigate, redirectTo]);
 
   useEffect(() => {
@@ -88,7 +88,7 @@ function AuthPage() {
           toast.error("E-mail ou senha incorretos.");
           return;
         }
-        navigate({ to: "/area", replace: true });
+        goNext();
       } else {
         const parsed = signUpSchema.safeParse(form);
         if (!parsed.success) {
@@ -120,7 +120,7 @@ function AuthPage() {
           return;
         }
         if (data.session) {
-          navigate({ to: "/area", replace: true });
+          goNext();
         } else {
           setEmailSent(true);
         }
