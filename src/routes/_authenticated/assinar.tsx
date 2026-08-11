@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useHydrated } from "@tanstack/react-router";
 import { MemberShell } from "@/components/member/MemberShell";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
