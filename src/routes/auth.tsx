@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({
+    redirect:
+      typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
+        ? search["redirect"]
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Entrar | Vision Club" },
@@ -44,16 +50,22 @@ const signUpSchema = signInSchema.extend({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { redirect: redirectTo } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", fullName: "", phone: "" });
 
+  const goNext = useCallback(() => {
+    if (redirectTo) navigate({ href: redirectTo, replace: true });
+    else navigate({ to: "/area", replace: true });
+  }, [navigate, redirectTo]);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/area", replace: true });
+      if (data.session) goNext();
     });
-  }, [navigate]);
+  }, [goNext]);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -76,7 +88,7 @@ function AuthPage() {
           toast.error("E-mail ou senha incorretos.");
           return;
         }
-        navigate({ to: "/area", replace: true });
+        goNext();
       } else {
         const parsed = signUpSchema.safeParse(form);
         if (!parsed.success) {
@@ -108,7 +120,7 @@ function AuthPage() {
           return;
         }
         if (data.session) {
-          navigate({ to: "/area", replace: true });
+          goNext();
         } else {
           setEmailSent(true);
         }
