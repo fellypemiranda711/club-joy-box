@@ -28,6 +28,9 @@ export const Route = createFileRoute("/_authenticated/assinar")({
 function AssinarPage() {
   const { plano } = Route.useSearch();
   const plan = planBySlug(plano);
+  const hydrated = useHydrated();
+
+
 
   return (
     <>
