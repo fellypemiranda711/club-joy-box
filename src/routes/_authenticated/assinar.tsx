@@ -58,14 +58,14 @@ function AssinarPage() {
                 pode cancelar quando quiser pela sua área do associado.
               </p>
             </div>
-            <StripeEmbeddedCheckout
-              priceId={plan.priceId}
-              returnUrl={
-                typeof window !== "undefined"
-                  ? `${window.location.origin}/area?checkout=success&session_id={CHECKOUT_SESSION_ID}`
-                  : "/area"
-              }
-            />
+            {hydrated ? (
+              <StripeEmbeddedCheckout
+                priceId={plan.priceId}
+                returnUrl={`${window.location.origin}/area?checkout=success&session_id={CHECKOUT_SESSION_ID}`}
+              />
+            ) : (
+              <div className="mt-6 h-64 animate-pulse rounded-2xl border border-border bg-muted/40" />
+            )}
           </>
         )}
       </MemberShell>
