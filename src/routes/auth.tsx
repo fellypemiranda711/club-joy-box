@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined } => ({
     redirect:
       typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
@@ -62,9 +63,19 @@ function AuthPage() {
   }, [navigate, redirectTo]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) goNext();
+    let active = true;
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active && session) goNext();
     });
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) goNext();
+    });
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+    };
   }, [goNext]);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
