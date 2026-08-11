@@ -50,16 +50,22 @@ const signUpSchema = signInSchema.extend({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { redirect: redirectTo } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [form, setForm] = useState({ email: "", password: "", fullName: "", phone: "" });
 
+  const goNext = useCallback(() => {
+    if (redirectTo) navigate({ href: redirectTo, replace: true });
+    else navigate({ to: "/area", replace: true });
+  }, [navigate, redirectTo]);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/area", replace: true });
+      if (data.session) goNext();
     });
-  }, [navigate]);
+  }, [goNext]);
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
