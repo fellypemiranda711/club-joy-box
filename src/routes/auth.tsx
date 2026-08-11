@@ -58,7 +58,7 @@ function AuthPage() {
 
   const goNext = useCallback(() => {
     if (redirectTo) navigate({ href: redirectTo, replace: true });
-    else goNext();
+    else navigate({ to: "/area", replace: true });
   }, [navigate, redirectTo]);
 
   useEffect(() => {
