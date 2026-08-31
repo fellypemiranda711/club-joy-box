@@ -134,7 +134,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
-  const hideHeader = isAdminRoute(location.pathname) || isMemberAreaRoute(location.pathname);
+  const admin = isAdminRoute(location.pathname);
+  const hideHeader = admin || isMemberAreaRoute(location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
