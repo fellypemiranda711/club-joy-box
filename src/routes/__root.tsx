@@ -130,12 +130,11 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
   const admin = isAdminRoute(location.pathname);
-  const hideHeader = admin || isMemberAreaRoute(location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col font-sans antialiased">
-        {!hideHeader && <Header />}
+        {!admin && <Header />}
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
