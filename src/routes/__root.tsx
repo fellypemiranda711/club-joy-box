@@ -20,6 +20,11 @@ function isAdminRoute(pathname: string) {
   return pathname === "/admin-login" || pathname.startsWith("/admin") || pathname === "/lab-login" || pathname.startsWith("/lab");
 }
 
+function isMemberAreaRoute(pathname: string) {
+  const prefixes = ["/area", "/perfil", "/orcamentos", "/assinar"];
+  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -130,11 +135,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const location = useLocation();
   const admin = isAdminRoute(location.pathname);
+  const hideHeader = admin || isMemberAreaRoute(location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col font-sans antialiased">
-        {!admin && <Header />}
+        {!hideHeader && <Header />}
         <main className="flex-1">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
