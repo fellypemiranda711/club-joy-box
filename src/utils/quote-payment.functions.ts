@@ -87,12 +87,26 @@ export const confirmQuotePayment = createServerFn({ method: "POST" })
       }
       if (session.payment_status !== "paid") return { paid: false };
 
-      const { error } = await supabase
+      // O associado não tem permissão de UPDATE em quote_requests (RLS libera
+      // apenas admins), então a baixa do pagamento é feita com o cliente
+      // privilegiado — depois de validar que a sessão Stripe pertence a ele.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: updated, error } = await supabaseAdmin
         .from("quote_requests")
         .update({ payment_status: "paid", paid_at: new Date().toISOString() })
         .eq("id", quoteId)
-        .eq("user_id", userId);
-      if (error) return { error: "Não foi possível registrar o pagamento." };
+        .eq("user_id", userId)
+        .select("id");
+      if (error || !updated || updated.length === 0) {
+        return { error: "Não foi possível registrar o pagamento." };
+      }
+
+      await supabaseAdmin.from("quote_status_events").insert({
+        quote_id: quoteId,
+        status: "paid",
+        note: "Pagamento confirmado no checkout.",
+        created_by: userId,
+      });
 
       return { paid: true };
     } catch (error) {
