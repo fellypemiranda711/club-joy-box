@@ -140,6 +140,7 @@ function OrcamentosPage() {
     },
     onSuccess: () => {
       toast.success("Solicitação enviada! Em breve retornamos com o orçamento.");
+      setWizardKey((k) => k + 1);
       queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
     },
     onError: (e: Error) => toast.error(e.message),
