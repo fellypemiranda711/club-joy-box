@@ -55,6 +55,7 @@ function OrcamentosPage() {
   const { quote_session: quoteSession } = Route.useSearch();
   const navigate = Route.useNavigate();
   const confirmedRef = useRef<string | null>(null);
+  const [wizardKey, setWizardKey] = useState(0);
 
   useEffect(() => {
     if (!quoteSession || confirmedRef.current === quoteSession) return;
