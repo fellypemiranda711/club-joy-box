@@ -106,27 +106,27 @@ function OrcamentosPage() {
   });
 
   const create = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (result: QuoteWizardResult) => {
       if (!isActive) throw new Error("Ative sua assinatura para solicitar orçamentos.");
-      const parsed = schema.safeParse(form);
+      const parsed = schema.safeParse({
+        patient_name: result.patient_name,
+        lens_type: result.lens_type,
+        notes: result.notes,
+      });
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dados inválidos");
 
       let prescriptionPath: string | null = null;
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) throw new Error("A receita deve ter no máximo 5 MB.");
-        const ext = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
+      if (result.file) {
+        if (result.file.size > 5 * 1024 * 1024) throw new Error("A receita deve ter no máximo 5 MB.");
+        const ext = result.file.name.split(".").pop()?.toLowerCase() ?? "pdf";
         const path = `${user!.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, file);
+        const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, result.file);
         if (upErr) throw new Error("Falha ao enviar a receita.");
         prescriptionPath = path;
       }
 
       const frameNote =
-        form.has_frame === "sim"
-          ? "Já possui a armação: Sim"
-          : form.has_frame === "nao"
-            ? "Já possui a armação: Não"
-            : "";
+        result.has_frame === "sim" ? "Já possui a armação: Sim" : "Já possui a armação: Não";
       const notes = [frameNote, parsed.data.notes].filter(Boolean).join("\n");
 
       const { error } = await supabase.from("quote_requests").insert({
@@ -140,8 +140,6 @@ function OrcamentosPage() {
     },
     onSuccess: () => {
       toast.success("Solicitação enviada! Em breve retornamos com o orçamento.");
-      setForm({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
-      setFile(null);
       queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
     },
     onError: (e: Error) => toast.error(e.message),
