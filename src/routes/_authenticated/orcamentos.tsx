@@ -215,74 +215,16 @@ function OrcamentosPage() {
         </div>
       )}
 
-      <form
-        className="mt-8 grid gap-4 rounded-2xl border border-border p-6 md:grid-cols-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          create.mutate();
-        }}
-      >
-        <div className="space-y-2">
-          <Label htmlFor="patient_name">Nome do paciente</Label>
-          <Input
-            id="patient_name"
-            value={form.patient_name}
-            maxLength={120}
-            onChange={(e) => setForm((f) => ({ ...f, patient_name: e.target.value }))}
+      {isActive && (
+        <div className="mt-8">
+          <QuoteRequestWizard
+            key={wizardKey}
+            disabled={!isActive}
+            isPending={create.isPending}
+            onSubmit={(result) => create.mutate(result)}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="lens_type">Tipo de lente</Label>
-          <Input
-            id="lens_type"
-            placeholder="Multifocal, visão simples..."
-            value={form.lens_type}
-            maxLength={120}
-            onChange={(e) => setForm((f) => ({ ...f, lens_type: e.target.value }))}
-          />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label>Você já possui a armação?</Label>
-          <RadioGroup
-            className="flex gap-6 pt-1"
-            value={form.has_frame}
-            onValueChange={(v) => setForm((f) => ({ ...f, has_frame: v }))}
-          >
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="sim" id="frame-sim" />
-              <Label htmlFor="frame-sim" className="font-normal">Sim, já tenho</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="nao" id="frame-nao" />
-              <Label htmlFor="frame-nao" className="font-normal">Não, preciso de uma</Label>
-            </div>
-          </RadioGroup>
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="prescription">Receita (PDF ou imagem, até 5 MB)</Label>
-          <Input
-            id="prescription"
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="notes">Observações</Label>
-          <Textarea
-            id="notes"
-            rows={4}
-            maxLength={1000}
-            value={form.notes}
-            onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={create.isPending || !isActive}>
-            {create.isPending ? "Enviando..." : "Enviar solicitação"}
-          </Button>
-        </div>
-      </form>
+      )}
 
       <div className="mt-10">
         <h2 className="font-display text-lg font-semibold">Histórico</h2>
