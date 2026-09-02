@@ -55,8 +55,6 @@ function OrcamentosPage() {
   const { quote_session: quoteSession } = Route.useSearch();
   const navigate = Route.useNavigate();
   const confirmedRef = useRef<string | null>(null);
-  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
-  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!quoteSession || confirmedRef.current === quoteSession) return;
