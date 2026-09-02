@@ -7,11 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { MemberShell } from "@/components/member/MemberShell";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isSubscriptionActive, planBySlug } from "@/lib/plan-catalog";
+import { QuoteRequestWizard, type QuoteWizardResult } from "@/components/member/QuoteRequestWizard";
 import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 import { OrderTracking } from "@/components/member/OrderTracking";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
@@ -58,8 +55,7 @@ function OrcamentosPage() {
   const { quote_session: quoteSession } = Route.useSearch();
   const navigate = Route.useNavigate();
   const confirmedRef = useRef<string | null>(null);
-  const [form, setForm] = useState({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
-  const [file, setFile] = useState<File | null>(null);
+  const [wizardKey, setWizardKey] = useState(0);
 
   useEffect(() => {
     if (!quoteSession || confirmedRef.current === quoteSession) return;
@@ -111,27 +107,27 @@ function OrcamentosPage() {
   });
 
   const create = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (result: QuoteWizardResult) => {
       if (!isActive) throw new Error("Ative sua assinatura para solicitar orçamentos.");
-      const parsed = schema.safeParse(form);
+      const parsed = schema.safeParse({
+        patient_name: result.patient_name,
+        lens_type: result.lens_type,
+        notes: result.notes,
+      });
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dados inválidos");
 
       let prescriptionPath: string | null = null;
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) throw new Error("A receita deve ter no máximo 5 MB.");
-        const ext = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
+      if (result.file) {
+        if (result.file.size > 5 * 1024 * 1024) throw new Error("A receita deve ter no máximo 5 MB.");
+        const ext = result.file.name.split(".").pop()?.toLowerCase() ?? "pdf";
         const path = `${user!.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, file);
+        const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, result.file);
         if (upErr) throw new Error("Falha ao enviar a receita.");
         prescriptionPath = path;
       }
 
       const frameNote =
-        form.has_frame === "sim"
-          ? "Já possui a armação: Sim"
-          : form.has_frame === "nao"
-            ? "Já possui a armação: Não"
-            : "";
+        result.has_frame === "sim" ? "Já possui a armação: Sim" : "Já possui a armação: Não";
       const notes = [frameNote, parsed.data.notes].filter(Boolean).join("\n");
 
       const { error } = await supabase.from("quote_requests").insert({
@@ -145,8 +141,7 @@ function OrcamentosPage() {
     },
     onSuccess: () => {
       toast.success("Solicitação enviada! Em breve retornamos com o orçamento.");
-      setForm({ patient_name: "", lens_type: "", notes: "", has_frame: "" });
-      setFile(null);
+      setWizardKey((k) => k + 1);
       queryClient.invalidateQueries({ queryKey: ["quotes", user?.id] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -220,74 +215,16 @@ function OrcamentosPage() {
         </div>
       )}
 
-      <form
-        className="mt-8 grid gap-4 rounded-2xl border border-border p-6 md:grid-cols-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          create.mutate();
-        }}
-      >
-        <div className="space-y-2">
-          <Label htmlFor="patient_name">Nome do paciente</Label>
-          <Input
-            id="patient_name"
-            value={form.patient_name}
-            maxLength={120}
-            onChange={(e) => setForm((f) => ({ ...f, patient_name: e.target.value }))}
+      {isActive && (
+        <div className="mt-8">
+          <QuoteRequestWizard
+            key={wizardKey}
+            disabled={!isActive}
+            isPending={create.isPending}
+            onSubmit={(result) => create.mutate(result)}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="lens_type">Tipo de lente</Label>
-          <Input
-            id="lens_type"
-            placeholder="Multifocal, visão simples..."
-            value={form.lens_type}
-            maxLength={120}
-            onChange={(e) => setForm((f) => ({ ...f, lens_type: e.target.value }))}
-          />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label>Você já possui a armação?</Label>
-          <RadioGroup
-            className="flex gap-6 pt-1"
-            value={form.has_frame}
-            onValueChange={(v) => setForm((f) => ({ ...f, has_frame: v }))}
-          >
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="sim" id="frame-sim" />
-              <Label htmlFor="frame-sim" className="font-normal">Sim, já tenho</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="nao" id="frame-nao" />
-              <Label htmlFor="frame-nao" className="font-normal">Não, preciso de uma</Label>
-            </div>
-          </RadioGroup>
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="prescription">Receita (PDF ou imagem, até 5 MB)</Label>
-          <Input
-            id="prescription"
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="notes">Observações</Label>
-          <Textarea
-            id="notes"
-            rows={4}
-            maxLength={1000}
-            value={form.notes}
-            onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <Button type="submit" disabled={create.isPending || !isActive}>
-            {create.isPending ? "Enviando..." : "Enviar solicitação"}
-          </Button>
-        </div>
-      </form>
+      )}
 
       <div className="mt-10">
         <h2 className="font-display text-lg font-semibold">Histórico</h2>
