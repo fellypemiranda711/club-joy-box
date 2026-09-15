@@ -141,6 +141,13 @@ function OrcamentosPage() {
       if (!user) throw new Error("Sessão expirada. Entre novamente.");
       if (patientName.trim().length < 3) throw new Error("Informe o nome do paciente.");
       if (!hasFrame) throw new Error("Informe se já possui a armação.");
+      if (hasFrame === "nao") {
+        throw new Error(
+          "Para um orçamento preciso é necessário ter a armação escolhida. Escolha a armação e volte para continuar.",
+        );
+      }
+      if (!frameFile) throw new Error("Envie uma foto ou imagem da armação.");
+
 
       const { data: hasActive, error: subError } = await supabase.rpc(
         "has_any_active_subscription",
