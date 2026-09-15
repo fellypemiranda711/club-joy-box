@@ -111,13 +111,16 @@ function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const frameInputRef = useRef<HTMLInputElement | null>(null);
 
   const [patientName, setPatientName] = useState("");
   const [hasFrame, setHasFrame] = useState<"sim" | "nao" | null>(null);
   const [lensType, setLensType] = useState("");
   const [treatments, setTreatments] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [frameFile, setFrameFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
+
 
   const requestsQuery = useQuery({
     queryKey: ["my-quote-requests", user?.id],
