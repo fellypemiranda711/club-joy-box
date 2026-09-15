@@ -389,7 +389,12 @@ function OrcamentosPage() {
                 <p className="rounded-xl bg-secondary/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
                   {LENS_OPTIONS.find((option) => option.value === lensType)?.description}
                 </p>
-              ) : null}
+              ) : (
+                <p className="rounded-xl bg-secondary/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                  Não sabe qual escolher? Selecione "Não sei, quero ajuda" que nossa equipe analisa
+                  sua receita e indica a lente ideal.
+                </p>
+              )}
             </div>
 
             {/* Tratamentos */}
