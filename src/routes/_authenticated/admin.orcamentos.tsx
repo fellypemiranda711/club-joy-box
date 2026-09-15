@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
 import { QuoteOptionsEditor } from "@/components/admin/QuoteOptionsEditor";
-import { LensSearchSelect } from "@/components/admin/LensSearchSelect";
+
 
 import { QuoteChat } from "@/components/chat/QuoteChat";
 import { useSession } from "@/hooks/use-session";
