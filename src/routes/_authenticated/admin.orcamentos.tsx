@@ -194,8 +194,21 @@ function OrcamentosPage() {
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {q.prescription_path && (
-                  <Button size="sm" variant="outline" onClick={() => openPrescription(q.prescription_path)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openFile(q.prescription_path, `Receita — ${q.patient_name}`)}
+                  >
                     Ver receita
+                  </Button>
+                )}
+                {extractFramePath(q.notes) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openFile(extractFramePath(q.notes), `Armação — ${q.patient_name}`)}
+                  >
+                    Ver armação
                   </Button>
                 )}
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
