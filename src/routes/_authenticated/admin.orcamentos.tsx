@@ -261,6 +261,23 @@ function OrcamentosPage() {
         })}
         {pending.length === 0 && <Empty>Nenhum orçamento pendente no momento.</Empty>}
       </section>
+
+      <Dialog open={!!preview} onOpenChange={(open) => !open && setPreview(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{preview?.title}</DialogTitle>
+          </DialogHeader>
+          {preview && (
+            <div className="flex max-h-[75vh] items-center justify-center overflow-auto rounded-lg bg-secondary/40">
+              <img
+                src={preview.url}
+                alt={preview.title}
+                className="max-h-[75vh] w-auto max-w-full object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminPage>
   );
 }
