@@ -248,6 +248,24 @@ function OrcamentosPage() {
             Preencha os dados abaixo e nossa equipe prepara sua cotação com os laboratórios parceiros.
           </p>
 
+          {submitted && (
+            <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+              <p className="text-sm font-medium">Solicitação enviada com sucesso</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Em até 24 horas você recebe seu orçamento aqui na sua área e pelo WhatsApp.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => setSubmitted(false)}
+              >
+                Fazer outra solicitação
+              </Button>
+            </div>
+          )}
+
           <form
             className="mt-6 space-y-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
             onSubmit={(e) => {
