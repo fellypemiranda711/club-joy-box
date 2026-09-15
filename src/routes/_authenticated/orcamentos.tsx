@@ -8,6 +8,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
+import imgAntirreflexo from "@/assets/treatments/antirreflexo.jpg";
+import imgFiltroAzul from "@/assets/treatments/filtro-azul.jpg";
+import imgFotossensivel from "@/assets/treatments/fotossensivel.jpg";
+import imgAfinamento from "@/assets/treatments/afinamento.jpg";
 
 export const Route = createFileRoute("/_authenticated/orcamentos")({
   head: () => ({
@@ -58,13 +62,21 @@ const LENS_OPTIONS = [
   },
 ];
 
-const TREATMENT_OPTIONS: { value: string; description: string; example: string }[] = [
+const TREATMENT_OPTIONS: {
+  value: string;
+  description: string;
+  example: string;
+  image: string;
+  alt: string;
+}[] = [
   {
     value: "Antirreflexo",
     description:
       "Reduz os reflexos na lente: visão mais nítida e óculos mais bonitos nas fotos.",
     example:
       "Exemplo: numa videochamada, as pessoas enxergam seus olhos em vez do reflexo da janela na lente.",
+    image: imgAntirreflexo,
+    alt: "Comparação: à esquerda, lente com reflexos da janela; à direita, lente antirreflexo sem reflexos",
   },
   {
     value: "Filtro azul",
@@ -72,6 +84,8 @@ const TREATMENT_OPTIONS: { value: string; description: string; example: string }
       "Ajuda a proteger os olhos da luz das telas de celular e computador.",
     example:
       "Exemplo: quem trabalha 8 horas por dia no computador sente menos ardência e cansaço no fim do dia.",
+    image: imgFiltroAzul,
+    alt: "Comparação: à esquerda, lente refletindo a luz forte da tela; à direita, lente com filtro azul",
   },
   {
     value: "Fotossensível",
@@ -79,6 +93,8 @@ const TREATMENT_OPTIONS: { value: string; description: string; example: string }
       "A lente escurece no sol e volta ao normal dentro de casa. Duas em uma.",
     example:
       "Exemplo: você sai do consultório para a rua e a lente vira óculos de sol na hora, sem precisar trocar.",
+    image: imgFotossensivel,
+    alt: "Comparação: à esquerda, lente clara dentro de casa; à direita, a mesma lente escurecida no sol",
   },
   {
     value: "Afinamento",
@@ -86,6 +102,8 @@ const TREATMENT_OPTIONS: { value: string; description: string; example: string }
       "Deixa a lente mais fina e leve, ideal para quem tem grau alto.",
     example:
       "Exemplo: com grau 6 em diante, a borda da lente fica bem mais discreta e o óculos fica mais leve no rosto.",
+    image: imgAfinamento,
+    alt: "Comparação vista de lado: à esquerda, lente grossa de grau alto; à direita, lente afinada",
   },
 ];
 
@@ -301,11 +319,25 @@ function OrcamentosPage() {
                         />
                         <span className="text-sm font-medium">{option.value}</span>
                       </span>
-                      <span className="mt-1.5 block pl-7 text-xs leading-relaxed text-muted-foreground">
+                      <span className="mt-3 overflow-hidden rounded-lg border border-border">
+                        <img
+                          src={option.image}
+                          alt={option.alt}
+                          loading="lazy"
+                          width={1200}
+                          height={675}
+                          className="block w-full"
+                        />
+                        <span className="flex justify-between bg-secondary/60 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                          <span>Sem o tratamento</span>
+                          <span>Com o tratamento</span>
+                        </span>
+                      </span>
+                      <span className="mt-1.5 block pl-0 text-xs leading-relaxed text-muted-foreground">
                         {option.description}
                       </span>
                       {checked && option.example ? (
-                        <span className="mt-1 block pl-7 text-xs leading-relaxed text-primary/90">
+                        <span className="mt-1 block pl-0 text-xs leading-relaxed text-primary/90">
                           {option.example}
                         </span>
                       ) : null}
