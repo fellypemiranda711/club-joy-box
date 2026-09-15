@@ -157,6 +157,7 @@ function OrcamentosPage() {
       setPatientName("");
       setHasFrame(null);
       setLensType("");
+      setTreatments([]);
       setFile(null);
       setNotes("");
     },
