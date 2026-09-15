@@ -1,32 +1,39 @@
 import { useId } from "react";
-import scene from "@/assets/vision-scene.jpg";
+import scene from "@/assets/vision-scene-cinematic.jpg";
 
 /**
- * Corredor de visão nítida por opção.
- * `width` = largura da zona nítida na parte de baixo (leitura),
- * `top` = onde o campo começa a estreitar, `feather` = suavidade da borda.
+ * Simulação cinematográfica do campo de visão de uma lente progressiva.
+ * Corredor de nitidez em formato orgânico (largo em cima para longe,
+ * estreito no meio, alargando embaixo para perto), marcadores de zona
+ * e periferia desfocada. O nível (tier) alarga o corredor.
  */
-const CORRIDOR: Record<number, { width: number; top: number; feather: number }> = {
-  1: { width: 0.2, top: 0.52, feather: 0.03 },
-  2: { width: 0.38, top: 0.46, feather: 0.028 },
-  3: { width: 0.58, top: 0.38, feather: 0.024 },
-  4: { width: 0.84, top: 0.28, feather: 0.02 },
+const CORRIDOR: Record<number, { wt: number; wm: number; wb: number }> = {
+  1: { wt: 0.2, wm: 0.11, wb: 0.17 },
+  2: { wt: 0.28, wm: 0.18, wb: 0.25 },
+  3: { wt: 0.38, wm: 0.27, wb: 0.35 },
+  4: { wt: 0.48, wm: 0.4, wb: 0.46 },
 };
 
-function corridorPath(width: number, top: number) {
-  const half = width / 2;
-  const l = 0.5 - half;
-  const r = 0.5 + half;
+/** Corredor orgânico: abre no topo (longe), estreita no meio, alarga na base (perto). */
+function corridorPath({ wt, wm, wb }: { wt: number; wm: number; wb: number }) {
+  const l = (h: number) => (0.5 - h).toFixed(3);
+  const r = (h: number) => (0.5 + h).toFixed(3);
   return [
-    "M 0.02 0.03",
-    "L 0.98 0.03",
-    `L 0.98 ${top.toFixed(3)}`,
-    `C 0.88 ${(top + 0.12).toFixed(3)}, ${(r + 0.08).toFixed(3)} ${(top + 0.22).toFixed(3)}, ${r.toFixed(3)} 0.97`,
-    `L ${l.toFixed(3)} 0.97`,
-    `C ${(l - 0.08).toFixed(3)} ${(top + 0.22).toFixed(3)}, 0.12 ${(top + 0.12).toFixed(3)}, 0.02 ${top.toFixed(3)}`,
+    `M ${l(wt)} 0.02`,
+    `C ${l(wt)} 0.24, ${l(wm + 0.04)} 0.3, ${l(wm)} 0.45`,
+    `C ${l(wm + 0.01)} 0.6, ${l(wb - 0.04)} 0.76, ${l(wb)} 0.98`,
+    `L ${r(wb)} 0.98`,
+    `C ${r(wb - 0.04)} 0.76, ${r(wm + 0.01)} 0.6, ${r(wm)} 0.45`,
+    `C ${r(wm + 0.04)} 0.3, ${r(wt)} 0.24, ${r(wt)} 0.02`,
     "Z",
   ].join(" ");
 }
+
+const ZONES = [
+  { label: "Longe", top: "16%" },
+  { label: "Intermediário", top: "46%" },
+  { label: "Perto", top: "76%" },
+];
 
 export function VisionFieldPreview({
   tier,
@@ -39,73 +46,68 @@ export function VisionFieldPreview({
 }) {
   const id = useId().replace(/:/g, "");
   const cfg = CORRIDOR[tier] ?? CORRIDOR[1]!;
-  const sharp = corridorPath(cfg.width, cfg.top);
-  // corredor intermediário: um pouco mais largo, para o desfoque ir em degradê
-  const mid = corridorPath(Math.min(cfg.width + 0.22, 0.95), Math.max(cfg.top - 0.08, 0.16));
+  const sharp = corridorPath(cfg);
 
   const maskSharp = `vf-sharp-${id}`;
-  const maskMid = `vf-mid-${id}`;
   const blurFilter = `vf-blur-${id}`;
 
   return (
-    <figure className={`overflow-hidden rounded-lg border border-border bg-secondary ${className}`}>
-      <div className="relative aspect-[16/10] w-full">
-        {/* camada 1: cena totalmente desfocada (periferia) */}
+    <figure className={`overflow-hidden rounded-xl border border-border bg-foreground ${className}`}>
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        {/* camada 1: cena desfocada e esmaecida (visão periférica) */}
         <img
           src={scene}
           alt=""
           aria-hidden
           loading="lazy"
-          width={1024}
-          height={640}
-          className="absolute inset-0 h-full w-full scale-110 object-cover blur-[10px] brightness-[0.92] saturate-[0.9]"
+          width={1280}
+          height={800}
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-80 blur-lg brightness-[0.85] saturate-[0.8]"
         />
-        {/* camada 2: desfoque médio dentro do corredor ampliado, com borda suave */}
-        <img
-          src={scene}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          width={1024}
-          height={640}
-          className="absolute inset-0 h-full w-full scale-[1.03] object-cover blur-[4px] brightness-[0.96]"
-          style={{ maskImage: `url(#${maskMid})`, WebkitMaskImage: `url(#${maskMid})`, mask: `url(#${maskMid})` }}
-        />
-        {/* camada 3: cena nítida no campo de visão */}
+        {/* camada 2: cena nítida recortada pelo corredor da lente */}
         <img
           src={scene}
           alt={`Simulação do campo de visão da opção ${tier}`}
           loading="lazy"
-          width={1024}
-          height={640}
+          width={1280}
+          height={800}
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ maskImage: `url(#${maskSharp})`, WebkitMaskImage: `url(#${maskSharp})`, mask: `url(#${maskSharp})` }}
+          style={{
+            maskImage: `url(#${maskSharp})`,
+            WebkitMaskImage: `url(#${maskSharp})`,
+            mask: `url(#${maskSharp})`,
+          }}
         />
 
         <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1 1" preserveAspectRatio="none">
           <defs>
             <filter id={blurFilter} x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation={cfg.feather} />
+              <feGaussianBlur stdDeviation={0.022} />
             </filter>
             <mask id={maskSharp} maskContentUnits="objectBoundingBox">
               <path d={sharp} fill="white" filter={`url(#${blurFilter})`} />
             </mask>
-            <mask id={maskMid} maskContentUnits="objectBoundingBox">
-              <path d={mid} fill="white" filter={`url(#${blurFilter})`} />
-            </mask>
           </defs>
-          <path
-            d={sharp}
-            fill="none"
-            stroke="white"
-            strokeOpacity={0.85}
-            strokeWidth={1.5}
-            vectorEffect="non-scaling-stroke"
-          />
         </svg>
+
+        {/* marcadores de zona */}
+        <div className="pointer-events-none absolute inset-0">
+          {ZONES.map((z) => (
+            <div
+              key={z.label}
+              className="absolute left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-black/25 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/75 backdrop-blur-md"
+              style={{ top: z.top }}
+            >
+              {z.label}
+            </div>
+          ))}
+        </div>
+
+        {/* vinheta cinematográfica */}
+        <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_46px_rgba(0,0,0,0.3)]" />
       </div>
       {label ? (
-        <figcaption className="border-t border-border bg-background px-2 py-1 text-center text-[11px] text-muted-foreground">
+        <figcaption className="border-t border-border bg-background px-2 py-1.5 text-center text-[11px] font-medium text-muted-foreground">
           {label}
         </figcaption>
       ) : null}
