@@ -10,6 +10,12 @@ import { useSession } from "@/hooks/use-session";
 
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   useAdminGate,
   useAdminLabs,
   useAdminLensProducts,
@@ -34,6 +40,13 @@ function OrcamentosPage() {
   const lensProducts = useAdminLensProducts(isAdmin);
   const queryClient = useQueryClient();
   const [lensByQuote, setLensByQuote] = useState<Record<string, string>>({});
+  const [preview, setPreview] = useState<{ url: string; title: string; isPdf: boolean } | null>(null);
+
+  function extractFramePath(notes: string | null): string | null {
+    if (!notes) return null;
+    const match = notes.match(/Foto da armação:\s*(\S+)/);
+    return match?.[1] ?? null;
+  }
 
   const setQuoteStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -76,14 +89,19 @@ function OrcamentosPage() {
     onError: () => toast.error("Não foi possível enviar o orçamento."),
   });
 
-  async function openPrescription(path: string | null) {
+  async function openFile(path: string | null, title: string) {
     if (!path) return;
     const { data, error } = await supabase.storage.from("prescriptions").createSignedUrl(path, 300);
     if (error || !data) {
-      toast.error("Não foi possível abrir a receita.");
+      toast.error("Não foi possível abrir o arquivo.");
       return;
     }
-    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    const isPdf = /\.pdf$/i.test(path);
+    if (isPdf) {
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setPreview({ url: data.signedUrl, title, isPdf });
   }
 
   const pending = (quotes.data ?? []).filter((q) => PENDING_STATUSES.includes(q.status));
@@ -176,8 +194,21 @@ function OrcamentosPage() {
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {q.prescription_path && (
-                  <Button size="sm" variant="outline" onClick={() => openPrescription(q.prescription_path)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openFile(q.prescription_path, `Receita — ${q.patient_name}`)}
+                  >
                     Ver receita
+                  </Button>
+                )}
+                {extractFramePath(q.notes) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openFile(extractFramePath(q.notes), `Armação — ${q.patient_name}`)}
+                  >
+                    Ver armação
                   </Button>
                 )}
                 <Button size="sm" variant="outline" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "quoting" })}>
@@ -230,6 +261,23 @@ function OrcamentosPage() {
         })}
         {pending.length === 0 && <Empty>Nenhum orçamento pendente no momento.</Empty>}
       </section>
+
+      <Dialog open={!!preview} onOpenChange={(open) => !open && setPreview(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{preview?.title}</DialogTitle>
+          </DialogHeader>
+          {preview && (
+            <div className="flex max-h-[75vh] items-center justify-center overflow-auto rounded-lg bg-secondary/40">
+              <img
+                src={preview.url}
+                alt={preview.title}
+                className="max-h-[75vh] w-auto max-w-full object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminPage>
   );
 }
