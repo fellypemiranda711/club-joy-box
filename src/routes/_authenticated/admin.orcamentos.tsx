@@ -40,6 +40,13 @@ function OrcamentosPage() {
   const lensProducts = useAdminLensProducts(isAdmin);
   const queryClient = useQueryClient();
   const [lensByQuote, setLensByQuote] = useState<Record<string, string>>({});
+  const [preview, setPreview] = useState<{ url: string; title: string; isPdf: boolean } | null>(null);
+
+  function extractFramePath(notes: string | null): string | null {
+    if (!notes) return null;
+    const match = notes.match(/Foto da armação:\s*(\S+)/);
+    return match?.[1] ?? null;
+  }
 
   const setQuoteStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
