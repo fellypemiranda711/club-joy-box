@@ -36,12 +36,26 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const LENS_OPTIONS = [
-  "Visão simples",
-  "Multifocal (progressiva)",
-  "Ocupacional (computador)",
-  "Fotossensível",
-  "Solar com grau",
-  "Não sei, quero ajuda",
+  {
+    value: "Visão simples",
+    description:
+      "Uma lente com um único grau, para ver de longe ou de perto. Ideal para quem usa óculos só para uma distância.",
+  },
+  {
+    value: "Multifocal (progressiva)",
+    description:
+      "Corrige de longe e de perto na mesma lente, sem linha visível. Para quem tem grau diferente para cada distância.",
+  },
+  {
+    value: "Ocupacional (computador)",
+    description:
+      "Feita para o trabalho em tela: nitidez no computador e na leitura, aliviando o cansaço visual no dia a dia.",
+  },
+  {
+    value: "Não sei, quero ajuda",
+    description:
+      "Sem problema! Nossa equipe analisa sua receita e te indica a lente ideal para o seu uso.",
+  },
 ];
 
 function OrcamentosPage() {
@@ -203,14 +217,20 @@ function OrcamentosPage() {
               >
                 <option value="">Selecione...</option>
                 {LENS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
+                  <option key={option.value} value={option.value}>
+                    {option.value}
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-muted-foreground">
-                Se tiver dúvida, escolha "Não sei, quero ajuda" e nossa equipe te orienta.
-              </p>
+              {lensType ? (
+                <p className="rounded-xl bg-secondary/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                  {LENS_OPTIONS.find((option) => option.value === lensType)?.description}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Se tiver dúvida, escolha "Não sei, quero ajuda" e nossa equipe te orienta.
+                </p>
+              )}
             </div>
 
             {/* Receita */}
