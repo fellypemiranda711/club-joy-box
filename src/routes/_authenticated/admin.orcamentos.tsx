@@ -154,19 +154,13 @@ function OrcamentosPage() {
                       </option>
                     ))}
                   </select>
-                  <select
-                    className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+                  <LensSearchSelect
+                    className="text-xs"
+                    products={labProducts}
                     value={lensByQuote[q.id] ?? ""}
-                    onChange={(e) => setLensByQuote((prev) => ({ ...prev, [q.id]: e.target.value }))}
-                  >
-                    <option value="">Escolher lente da tabela</option>
-                    {labProducts.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                        {p.refraction_index ? ` ${p.refraction_index}` : ""} — {brl(p.price_cents)}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(id) => setLensByQuote((prev) => ({ ...prev, [q.id]: id }))}
+                  />
+
                 </div>
               </div>
 
