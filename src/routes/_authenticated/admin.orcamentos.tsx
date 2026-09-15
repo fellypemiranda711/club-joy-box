@@ -89,14 +89,19 @@ function OrcamentosPage() {
     onError: () => toast.error("Não foi possível enviar o orçamento."),
   });
 
-  async function openPrescription(path: string | null) {
+  async function openFile(path: string | null, title: string) {
     if (!path) return;
     const { data, error } = await supabase.storage.from("prescriptions").createSignedUrl(path, 300);
     if (error || !data) {
-      toast.error("Não foi possível abrir a receita.");
+      toast.error("Não foi possível abrir o arquivo.");
       return;
     }
-    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    const isPdf = /\.pdf$/i.test(path);
+    if (isPdf) {
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setPreview({ url: data.signedUrl, title, isPdf });
   }
 
   const pending = (quotes.data ?? []).filter((q) => PENDING_STATUSES.includes(q.status));
