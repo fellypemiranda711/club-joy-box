@@ -62,7 +62,7 @@ export function VisionFieldPreview({
           loading="lazy"
           width={1280}
           height={800}
-          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-60 blur-xl saturate-[0.75]"
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-80 blur-lg brightness-[0.85] saturate-[0.8]"
         />
         {/* camada 2: cena nítida recortada pelo corredor da lente */}
         <img
@@ -88,15 +88,6 @@ export function VisionFieldPreview({
               <path d={sharp} fill="white" filter={`url(#${blurFilter})`} />
             </mask>
           </defs>
-          {/* brilho sutil contornando o corredor, como reflexo de vidro */}
-          <path
-            d={sharp}
-            fill="none"
-            stroke="white"
-            strokeOpacity={0.18}
-            strokeWidth={1.2}
-            vectorEffect="non-scaling-stroke"
-          />
         </svg>
 
         {/* marcadores de zona */}
@@ -113,7 +104,7 @@ export function VisionFieldPreview({
         </div>
 
         {/* vinheta cinematográfica */}
-        <div className="pointer-events-none absolute inset-0 rounded-none shadow-[inset_0_0_60px_rgba(0,0,0,0.55)]" />
+        <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_46px_rgba(0,0,0,0.3)]" />
       </div>
       {label ? (
         <figcaption className="border-t border-border bg-background px-2 py-1.5 text-center text-[11px] font-medium text-muted-foreground">
