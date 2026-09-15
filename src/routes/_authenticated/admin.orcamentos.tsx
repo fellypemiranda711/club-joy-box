@@ -250,7 +250,7 @@ function OrcamentosPage() {
                     }
                   }}
                 >
-                  {selectedLens ? `Enviar ${brl(selectedLens.price_cents)} por WhatsApp` : "Enviar orçamento por WhatsApp"}
+                  {selectedLens ? `Falar no WhatsApp — ${brl(selectedLens.price_cents)}` : "Falar no WhatsApp"}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setQuoteStatus.mutate({ id: q.id, status: "canceled" })}>
                   Cancelar
