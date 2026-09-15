@@ -120,6 +120,7 @@ function OrcamentosPage() {
   const [file, setFile] = useState<File | null>(null);
   const [frameFile, setFrameFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
 
   const requestsQuery = useQuery({
@@ -201,7 +202,8 @@ function OrcamentosPage() {
       if (insertError) throw insertError;
     },
     onSuccess: () => {
-      toast.success("Solicitação enviada! Nossa equipe vai analisar e te retornar.");
+      toast.success("Solicitação enviada! Em até 24 horas você recebe seu orçamento.");
+      setSubmitted(true);
       queryClient.invalidateQueries({ queryKey: ["my-quote-requests"] });
       setPatientName("");
       setHasFrame(null);
@@ -246,6 +248,25 @@ function OrcamentosPage() {
             Preencha os dados abaixo e nossa equipe prepara sua cotação com os laboratórios parceiros.
           </p>
 
+          {submitted && (
+            <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+              <p className="text-sm font-medium">Solicitação enviada com sucesso</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Em até 24 horas você recebe seu orçamento aqui na sua área e pelo WhatsApp.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => setSubmitted(false)}
+              >
+                Fazer outra solicitação
+              </Button>
+            </div>
+          )}
+
+          {!submitted && (
           <form
             className="mt-6 space-y-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
             onSubmit={(e) => {
@@ -507,6 +528,7 @@ function OrcamentosPage() {
             )}
 
           </form>
+          )}
         </div>
 
         <aside>
