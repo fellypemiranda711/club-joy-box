@@ -55,11 +55,6 @@ const LENS_OPTIONS = [
     description:
       "Feita para o trabalho em tela: nitidez no computador e na leitura, aliviando o cansaço visual no dia a dia.",
   },
-  {
-    value: "Não sei, quero ajuda",
-    description:
-      "Sem problema! Nossa equipe analisa sua receita e te indica a lente ideal para o seu uso.",
-  },
 ];
 
 const TREATMENT_OPTIONS: {
