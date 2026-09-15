@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock, FileText, Loader2, SendHorizonal, Upload, X } from "lucide-react";
+import { Clock, FileText, Image as ImageIcon, Loader2, SendHorizonal, Upload, X } from "lucide-react";
 import { MemberShell } from "@/components/member/MemberShell";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -111,13 +111,16 @@ function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const frameInputRef = useRef<HTMLInputElement | null>(null);
 
   const [patientName, setPatientName] = useState("");
   const [hasFrame, setHasFrame] = useState<"sim" | "nao" | null>(null);
   const [lensType, setLensType] = useState("");
   const [treatments, setTreatments] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [frameFile, setFrameFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
+
 
   const requestsQuery = useQuery({
     queryKey: ["my-quote-requests", user?.id],
@@ -138,6 +141,13 @@ function OrcamentosPage() {
       if (!user) throw new Error("Sessão expirada. Entre novamente.");
       if (patientName.trim().length < 3) throw new Error("Informe o nome do paciente.");
       if (!hasFrame) throw new Error("Informe se já possui a armação.");
+      if (hasFrame === "nao") {
+        throw new Error(
+          "Para um orçamento preciso é necessário ter a armação escolhida. Escolha a armação e volte para continuar.",
+        );
+      }
+      if (!frameFile) throw new Error("Envie uma foto ou imagem da armação.");
+
 
       const { data: hasActive, error: subError } = await supabase.rpc(
         "has_any_active_subscription",
@@ -159,11 +169,24 @@ function OrcamentosPage() {
         prescriptionPath = path;
       }
 
+      let framePath: string | null = null;
+      if (frameFile) {
+        const ext = frameFile.name.split(".").pop() ?? "bin";
+        const path = `${user.id}/armacao-${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("prescriptions")
+          .upload(path, frameFile, { contentType: frameFile.type });
+        if (uploadError) throw uploadError;
+        framePath = path;
+      }
+
       const notesText = [
-        `Armação: ${hasFrame === "sim" ? "já possui" : "precisa de uma"}`,
+        `Armação: já possui`,
+        framePath ? `Foto da armação: ${framePath}` : null,
         treatments.length > 0 ? `Tratamentos: ${treatments.join(", ")}` : null,
         notes.trim() ? `Observações: ${notes.trim()}` : null,
       ]
+
         .filter(Boolean)
         .join(" | ");
 
@@ -185,6 +208,7 @@ function OrcamentosPage() {
       setLensType("");
       setTreatments([]);
       setFile(null);
+      setFrameFile(null);
       setNotes("");
     },
     onError: (error) => {
@@ -200,6 +224,16 @@ function OrcamentosPage() {
     }
     setFile(selected);
   }
+
+  function pickFrameFile(selected: File | null) {
+    if (!selected) return;
+    if (selected.size > 5 * 1024 * 1024) {
+      toast.error("A imagem da armação deve ter no máximo 5 MB.");
+      return;
+    }
+    setFrameFile(selected);
+  }
+
 
   const isPending = submitMutation.isPending;
 
@@ -254,6 +288,62 @@ function OrcamentosPage() {
                 </label>
               </RadioGroup>
             </div>
+
+            {hasFrame === "nao" && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+                <p className="font-medium">Precisamos da armação escolhida para continuar</p>
+                <p className="mt-1 text-muted-foreground">
+                  O valor das lentes muda conforme o modelo e o tamanho da armação. Sem ela, o
+                  orçamento não sai preciso. Escolha a sua armação (na ótica de preferência ou com
+                  nossa equipe) e volte aqui para seguir com o pedido.
+                </p>
+              </div>
+            )}
+
+            {hasFrame === "sim" && (
+              <>
+                {/* Foto da armação */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Foto da armação</p>
+                  <p className="text-xs text-muted-foreground">
+                    Envie uma foto da armação (de frente e, se possível, com a marca/modelo visível).
+                  </p>
+                  <input
+                    ref={frameInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => pickFrameFile(e.target.files?.[0] ?? null)}
+                  />
+                  {frameFile ? (
+                    <div className="flex items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+                      <span className="inline-flex min-w-0 items-center gap-2">
+                        <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="truncate">{frameFile.name}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFrameFile(null)}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Remover imagem da armação"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => frameInputRef.current?.click()}
+                      className="inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                      disabled={isPending}
+                    >
+                      <Upload className="h-4 w-4" />
+                      Anexar foto da armação (até 5 MB)
+                    </button>
+                  )}
+                </div>
+
+
 
             {/* Tipo de lente */}
             <div className="space-y-2">
@@ -402,17 +492,20 @@ function OrcamentosPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
-                </>
-              ) : (
-                <>
-                  <SendHorizonal className="h-4 w-4" /> Enviar solicitação
-                </>
-              )}
-            </Button>
+                <Button type="submit" className="w-full" disabled={isPending || !frameFile}>
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <SendHorizonal className="h-4 w-4" /> Enviar solicitação
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
+
           </form>
         </div>
 
