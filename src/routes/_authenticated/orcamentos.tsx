@@ -208,6 +208,7 @@ function OrcamentosPage() {
       setLensType("");
       setTreatments([]);
       setFile(null);
+      setFrameFile(null);
       setNotes("");
     },
     onError: (error) => {
@@ -223,6 +224,16 @@ function OrcamentosPage() {
     }
     setFile(selected);
   }
+
+  function pickFrameFile(selected: File | null) {
+    if (!selected) return;
+    if (selected.size > 5 * 1024 * 1024) {
+      toast.error("A imagem da armação deve ter no máximo 5 MB.");
+      return;
+    }
+    setFrameFile(selected);
+  }
+
 
   const isPending = submitMutation.isPending;
 
