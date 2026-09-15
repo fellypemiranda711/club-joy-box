@@ -135,6 +135,7 @@ function OrcamentosPage() {
 
       const notesText = [
         `Armação: ${hasFrame === "sim" ? "já possui" : "precisa de uma"}`,
+        treatments.length > 0 ? `Tratamentos: ${treatments.join(", ")}` : null,
         notes.trim() ? `Observações: ${notes.trim()}` : null,
       ]
         .filter(Boolean)
