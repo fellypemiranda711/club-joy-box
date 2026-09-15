@@ -492,17 +492,20 @@ function OrcamentosPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
-                </>
-              ) : (
-                <>
-                  <SendHorizonal className="h-4 w-4" /> Enviar solicitação
-                </>
-              )}
-            </Button>
+                <Button type="submit" className="w-full" disabled={isPending || !frameFile}>
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <SendHorizonal className="h-4 w-4" /> Enviar solicitação
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
+
           </form>
         </div>
 
