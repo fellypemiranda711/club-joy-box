@@ -201,7 +201,8 @@ function OrcamentosPage() {
       if (insertError) throw insertError;
     },
     onSuccess: () => {
-      toast.success("Solicitação enviada! Nossa equipe vai analisar e te retornar.");
+      toast.success("Solicitação enviada! Em até 24 horas você recebe seu orçamento.");
+      setSubmitted(true);
       queryClient.invalidateQueries({ queryKey: ["my-quote-requests"] });
       setPatientName("");
       setHasFrame(null);
