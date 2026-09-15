@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin/orcamentos")({
   component: OrcamentosPage,
 });
 
-const PENDING_STATUSES = ["received", "quoting", "quoted"];
+const PENDING_STATUSES = ["pending", "received", "quoting", "quoted"];
 
 function OrcamentosPage() {
   const { isAdmin } = useAdminGate();

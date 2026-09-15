@@ -197,7 +197,7 @@ function OrcamentosPage() {
         lens_type: lensType || null,
         notes: notesText,
         prescription_path: prescriptionPath,
-        status: "pending",
+        status: "received",
       });
       if (insertError) throw insertError;
     },
