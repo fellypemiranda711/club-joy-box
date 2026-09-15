@@ -259,6 +259,54 @@ function OrcamentosPage() {
               )}
             </div>
 
+            {/* Tratamentos */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Tratamentos (opcional)</p>
+              <p className="text-xs text-muted-foreground">
+                Escolha os que quiser incluir na sua lente. Você pode marcar mais de um.
+              </p>
+              <div className="space-y-2">
+                {TREATMENT_OPTIONS.map((option) => {
+                  const checked = treatments.includes(option.value);
+                  return (
+                    <label
+                      key={option.value}
+                      className={`block cursor-pointer rounded-xl border px-4 py-3 transition-colors ${
+                        checked
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border bg-secondary/40 hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={isPending}
+                          onChange={() =>
+                            setTreatments((prev) =>
+                              prev.includes(option.value)
+                                ? prev.filter((t) => t !== option.value)
+                                : [...prev, option.value],
+                            )
+                          }
+                          className="h-4 w-4 shrink-0 accent-[hsl(var(--primary))]"
+                        />
+                        <span className="text-sm font-medium">{option.value}</span>
+                      </span>
+                      <span className="mt-1.5 block pl-7 text-xs leading-relaxed text-muted-foreground">
+                        {option.description}
+                      </span>
+                      {checked && option.example ? (
+                        <span className="mt-1 block pl-7 text-xs leading-relaxed text-primary/90">
+                          {option.example}
+                        </span>
+                      ) : null}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Receita */}
             <div className="space-y-2">
               <p className="text-sm font-medium">Receita oftalmológica (opcional)</p>
