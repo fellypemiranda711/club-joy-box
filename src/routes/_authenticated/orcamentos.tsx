@@ -266,6 +266,7 @@ function OrcamentosPage() {
             </div>
           )}
 
+          {!submitted && (
           <form
             className="mt-6 space-y-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
             onSubmit={(e) => {
@@ -527,6 +528,7 @@ function OrcamentosPage() {
             )}
 
           </form>
+          )}
         </div>
 
         <aside>
