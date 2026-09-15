@@ -384,11 +384,7 @@ function OrcamentosPage() {
                 <p className="rounded-xl bg-secondary/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
                   {LENS_OPTIONS.find((option) => option.value === lensType)?.description}
                 </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Se tiver dúvida, escolha "Não sei, quero ajuda" e nossa equipe te orienta.
-                </p>
-              )}
+              ) : null}
             </div>
 
             {/* Tratamentos */}
