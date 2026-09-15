@@ -289,6 +289,62 @@ function OrcamentosPage() {
               </RadioGroup>
             </div>
 
+            {hasFrame === "nao" && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+                <p className="font-medium">Precisamos da armação escolhida para continuar</p>
+                <p className="mt-1 text-muted-foreground">
+                  O valor das lentes muda conforme o modelo e o tamanho da armação. Sem ela, o
+                  orçamento não sai preciso. Escolha a sua armação (na ótica de preferência ou com
+                  nossa equipe) e volte aqui para seguir com o pedido.
+                </p>
+              </div>
+            )}
+
+            {hasFrame === "sim" && (
+              <>
+                {/* Foto da armação */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Foto da armação</p>
+                  <p className="text-xs text-muted-foreground">
+                    Envie uma foto da armação (de frente e, se possível, com a marca/modelo visível).
+                  </p>
+                  <input
+                    ref={frameInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => pickFrameFile(e.target.files?.[0] ?? null)}
+                  />
+                  {frameFile ? (
+                    <div className="flex items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+                      <span className="inline-flex min-w-0 items-center gap-2">
+                        <ImageIcon className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="truncate">{frameFile.name}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFrameFile(null)}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Remover imagem da armação"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => frameInputRef.current?.click()}
+                      className="inline-flex items-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                      disabled={isPending}
+                    >
+                      <Upload className="h-4 w-4" />
+                      Anexar foto da armação (até 5 MB)
+                    </button>
+                  )}
+                </div>
+
+
+
             {/* Tipo de lente */}
             <div className="space-y-2">
               <label htmlFor="lens-type" className="text-sm font-medium">
