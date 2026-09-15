@@ -62,7 +62,7 @@ function OrcamentosPage() {
 
       const { data: hasActive, error: subError } = await supabase.rpc(
         "has_any_active_subscription",
-        { _user_id: user.id },
+        { user_uuid: user.id },
       );
       if (subError) throw subError;
       if (!hasActive) {
