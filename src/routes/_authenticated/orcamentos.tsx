@@ -58,6 +58,37 @@ const LENS_OPTIONS = [
   },
 ];
 
+const TREATMENT_OPTIONS: { value: string; description: string; example: string }[] = [
+  {
+    value: "Antirreflexo",
+    description:
+      "Reduz os reflexos na lente: visão mais nítida e óculos mais bonitos nas fotos.",
+    example:
+      "Exemplo: numa videochamada, as pessoas enxergam seus olhos em vez do reflexo da janela na lente.",
+  },
+  {
+    value: "Filtro azul",
+    description:
+      "Ajuda a proteger os olhos da luz das telas de celular e computador.",
+    example:
+      "Exemplo: quem trabalha 8 horas por dia no computador sente menos ardência e cansaço no fim do dia.",
+  },
+  {
+    value: "Fotossensível",
+    description:
+      "A lente escurece no sol e volta ao normal dentro de casa. Duas em uma.",
+    example:
+      "Exemplo: você sai do consultório para a rua e a lente vira óculos de sol na hora, sem precisar trocar.",
+  },
+  {
+    value: "Afinamento",
+    description:
+      "Deixa a lente mais fina e leve, ideal para quem tem grau alto.",
+    example:
+      "Exemplo: com grau 6 em diante, a borda da lente fica bem mais discreta e o óculos fica mais leve no rosto.",
+  },
+];
+
 function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
@@ -66,6 +97,7 @@ function OrcamentosPage() {
   const [patientName, setPatientName] = useState("");
   const [hasFrame, setHasFrame] = useState<"sim" | "nao" | null>(null);
   const [lensType, setLensType] = useState("");
+  const [treatments, setTreatments] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
 
@@ -111,6 +143,7 @@ function OrcamentosPage() {
 
       const notesText = [
         `Armação: ${hasFrame === "sim" ? "já possui" : "precisa de uma"}`,
+        treatments.length > 0 ? `Tratamentos: ${treatments.join(", ")}` : null,
         notes.trim() ? `Observações: ${notes.trim()}` : null,
       ]
         .filter(Boolean)
@@ -132,6 +165,7 @@ function OrcamentosPage() {
       setPatientName("");
       setHasFrame(null);
       setLensType("");
+      setTreatments([]);
       setFile(null);
       setNotes("");
     },
@@ -231,6 +265,54 @@ function OrcamentosPage() {
                   Se tiver dúvida, escolha "Não sei, quero ajuda" e nossa equipe te orienta.
                 </p>
               )}
+            </div>
+
+            {/* Tratamentos */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Tratamentos (opcional)</p>
+              <p className="text-xs text-muted-foreground">
+                Escolha os que quiser incluir na sua lente. Você pode marcar mais de um.
+              </p>
+              <div className="space-y-2">
+                {TREATMENT_OPTIONS.map((option) => {
+                  const checked = treatments.includes(option.value);
+                  return (
+                    <label
+                      key={option.value}
+                      className={`block cursor-pointer rounded-xl border px-4 py-3 transition-colors ${
+                        checked
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border bg-secondary/40 hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={isPending}
+                          onChange={() =>
+                            setTreatments((prev) =>
+                              prev.includes(option.value)
+                                ? prev.filter((t) => t !== option.value)
+                                : [...prev, option.value],
+                            )
+                          }
+                          className="h-4 w-4 shrink-0 accent-[hsl(var(--primary))]"
+                        />
+                        <span className="text-sm font-medium">{option.value}</span>
+                      </span>
+                      <span className="mt-1.5 block pl-7 text-xs leading-relaxed text-muted-foreground">
+                        {option.description}
+                      </span>
+                      {checked && option.example ? (
+                        <span className="mt-1 block pl-7 text-xs leading-relaxed text-primary/90">
+                          {option.example}
+                        </span>
+                      ) : null}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Receita */}
