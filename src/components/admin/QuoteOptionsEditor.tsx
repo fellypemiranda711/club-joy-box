@@ -8,6 +8,8 @@ import { brl } from "@/lib/admin";
 import { MARKET_MULTIPLIER, marketPriceCents, savingsPercent, visionTiers } from "@/lib/quote-options";
 import { buildOptionsMessage, buildWhatsappUrl, parseBRLToCents } from "@/lib/whatsapp";
 import { VisionFieldPreview } from "@/components/VisionFieldPreview";
+import { LensSearchSelect } from "@/components/admin/LensSearchSelect";
+
 
 type LensProduct = {
   id: string;
@@ -189,13 +191,15 @@ export function QuoteOptionsEditor(props: {
               </div>
               <VisionFieldPreview className="mt-3 max-w-xs" tier={t.tier} label={t.title} />
               <div className="mt-3 grid gap-2 md:grid-cols-4">
-                <select
-                  className="h-9 rounded-md border border-border bg-background px-2 text-xs md:col-span-2"
+                <LensSearchSelect
+                  className="md:col-span-2"
+                  products={products}
                   value={row.lens_product_id}
-                  onChange={(e) => {
-                    const p = products.find((x) => x.id === e.target.value);
+                  placeholder="Escolher lente da tabela (opcional)"
+                  onChange={(id) => {
+                    const p = products.find((x) => x.id === id);
                     setRow(t.tier, {
-                      lens_product_id: e.target.value,
+                      lens_product_id: id,
                       ...(p
                         ? {
                             title: p.name,
@@ -204,15 +208,8 @@ export function QuoteOptionsEditor(props: {
                         : {}),
                     });
                   }}
-                >
-                  <option value="">Escolher lente da tabela (opcional)</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                      {p.refraction_index ? ` ${p.refraction_index}` : ""} — {brl(p.price_cents)}
-                    </option>
-                  ))}
-                </select>
+                />
+
                 <Input
                   className="h-9 text-xs"
                   placeholder="Nome mostrado ao associado"
