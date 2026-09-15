@@ -58,26 +58,34 @@ const LENS_OPTIONS = [
   },
 ];
 
-const TREATMENT_OPTIONS = [
+const TREATMENT_OPTIONS: { value: string; description: string; example: string }[] = [
   {
     value: "Antirreflexo",
     description:
       "Reduz os reflexos na lente: visão mais nítida e óculos mais bonitos nas fotos.",
+    example:
+      "Exemplo: numa videochamada, as pessoas enxergam seus olhos em vez do reflexo da janela na lente.",
   },
   {
     value: "Filtro azul",
     description:
       "Ajuda a proteger os olhos da luz das telas de celular e computador.",
+    example:
+      "Exemplo: quem trabalha 8 horas por dia no computador sente menos ardência e cansaço no fim do dia.",
   },
   {
     value: "Fotossensível",
     description:
       "A lente escurece no sol e volta ao normal dentro de casa. Duas em uma.",
+    example:
+      "Exemplo: você sai do consultório para a rua e a lente vira óculos de sol na hora, sem precisar trocar.",
   },
   {
     value: "Afinamento",
     description:
       "Deixa a lente mais fina e leve, ideal para quem tem grau alto.",
+    example:
+      "Exemplo: com grau 6 em diante, a borda da lente fica bem mais discreta e o óculos fica mais leve no rosto.",
   },
 ];
 
