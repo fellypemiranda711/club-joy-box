@@ -120,6 +120,7 @@ function OrcamentosPage() {
   const [file, setFile] = useState<File | null>(null);
   const [frameFile, setFrameFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
 
   const requestsQuery = useQuery({
