@@ -58,6 +58,29 @@ const LENS_OPTIONS = [
   },
 ];
 
+const TREATMENT_OPTIONS = [
+  {
+    value: "Antirreflexo",
+    description:
+      "Reduz os reflexos na lente: visão mais nítida e óculos mais bonitos nas fotos.",
+  },
+  {
+    value: "Filtro azul",
+    description:
+      "Ajuda a proteger os olhos da luz das telas de celular e computador.",
+  },
+  {
+    value: "Fotossensível",
+    description:
+      "A lente escurece no sol e volta ao normal dentro de casa. Duas em uma.",
+  },
+  {
+    value: "Afinamento",
+    description:
+      "Deixa a lente mais fina e leve, ideal para quem tem grau alto.",
+  },
+];
+
 function OrcamentosPage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
