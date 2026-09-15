@@ -439,7 +439,7 @@ function OrcamentosPage() {
 
             {/* Receita */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Receita oftalmológica (opcional)</p>
+              <p className="text-sm font-medium">Receita oftalmológica</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -492,7 +492,7 @@ function OrcamentosPage() {
               />
             </div>
 
-                <Button type="submit" className="w-full" disabled={isPending || !frameFile}>
+                <Button type="submit" className="w-full" disabled={isPending || !frameFile || !file}>
                   {isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
