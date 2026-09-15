@@ -169,11 +169,24 @@ function OrcamentosPage() {
         prescriptionPath = path;
       }
 
+      let framePath: string | null = null;
+      if (frameFile) {
+        const ext = frameFile.name.split(".").pop() ?? "bin";
+        const path = `${user.id}/armacao-${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("prescriptions")
+          .upload(path, frameFile, { contentType: frameFile.type });
+        if (uploadError) throw uploadError;
+        framePath = path;
+      }
+
       const notesText = [
-        `Armação: ${hasFrame === "sim" ? "já possui" : "precisa de uma"}`,
+        `Armação: já possui`,
+        framePath ? `Foto da armação: ${framePath}` : null,
         treatments.length > 0 ? `Tratamentos: ${treatments.join(", ")}` : null,
         notes.trim() ? `Observações: ${notes.trim()}` : null,
       ]
+
         .filter(Boolean)
         .join(" | ");
 
