@@ -55,11 +55,6 @@ const LENS_OPTIONS = [
     description:
       "Feita para o trabalho em tela: nitidez no computador e na leitura, aliviando o cansaço visual no dia a dia.",
   },
-  {
-    value: "Não sei, quero ajuda",
-    description:
-      "Sem problema! Nossa equipe analisa sua receita e te indica a lente ideal para o seu uso.",
-  },
 ];
 
 const TREATMENT_OPTIONS: {
@@ -389,11 +384,7 @@ function OrcamentosPage() {
                 <p className="rounded-xl bg-secondary/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
                   {LENS_OPTIONS.find((option) => option.value === lensType)?.description}
                 </p>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Se tiver dúvida, escolha "Não sei, quero ajuda" e nossa equipe te orienta.
-                </p>
-              )}
+              ) : null}
             </div>
 
             {/* Tratamentos */}
