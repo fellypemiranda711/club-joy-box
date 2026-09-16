@@ -141,7 +141,8 @@ function OrcamentosPage() {
       const { data, error } = await supabase
         .from("quote_requests")
         .select(
-          "id, patient_name, lens_type, status, payment_status, quoted_amount_cents, created_at",
+          "id, os_number, patient_name, lens_type, status, payment_status, quoted_amount_cents, created_at",
+
         )
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
