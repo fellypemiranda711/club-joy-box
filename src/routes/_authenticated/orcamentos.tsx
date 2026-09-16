@@ -141,7 +141,8 @@ function OrcamentosPage() {
       const { data, error } = await supabase
         .from("quote_requests")
         .select(
-          "id, patient_name, lens_type, status, payment_status, quoted_amount_cents, created_at",
+          "id, os_number, patient_name, lens_type, status, payment_status, quoted_amount_cents, created_at",
+
         )
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
@@ -586,7 +587,13 @@ function OrcamentosPage() {
                   className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)]"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium">{req.patient_name}</p>
+                    <div>
+                      <span className="mb-1 inline-block rounded-md bg-primary/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-primary">
+                        {(req as { os_number?: string | null }).os_number ?? "OS —"}
+                      </span>
+                      <p className="text-sm font-medium">{req.patient_name}</p>
+                    </div>
+
                     <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground">
                       <Clock className="h-3 w-3" />
                       {STATUS_LABELS[req.status] ?? req.status}
