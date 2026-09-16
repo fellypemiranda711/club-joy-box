@@ -108,6 +108,46 @@ function PedidosPage() {
     onError: () => toast.error("Não foi possível atualizar as medidas."),
   });
 
+  const saveMeasurements = useMutation({
+    mutationFn: async ({
+      quoteId,
+      measurementId,
+      userId,
+      values,
+    }: {
+      quoteId: string;
+      measurementId: string | null;
+      userId: string;
+      values: {
+        pd_mm: number | null;
+        dnp_right_mm: number | null;
+        dnp_left_mm: number | null;
+        height_right_mm: number | null;
+        height_left_mm: number | null;
+      };
+    }) => {
+      if (measurementId) {
+        const { error } = await supabase
+          .from("quote_measurements")
+          .update(values)
+          .eq("id", measurementId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("quote_measurements").insert({
+          quote_id: quoteId,
+          user_id: userId,
+          ...values,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Medidas salvas.");
+      queryClient.invalidateQueries({ queryKey: ["admin-measurements"] });
+    },
+    onError: () => toast.error("Não foi possível salvar as medidas."),
+  });
+
   async function openPhoto(path: string | null) {
     if (!path) return;
     const { data, error } = await supabase.storage.from("measurements").createSignedUrl(path, 300);
