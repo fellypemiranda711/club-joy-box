@@ -31,6 +31,7 @@ export function QuoteOptionsPicker(props: { quoteId: string; canChoose: boolean;
       toast.success("Opção escolhida! Agora envie as medidas por foto.");
       queryClient.invalidateQueries({ queryKey: ["member-quote-options", props.quoteId] });
       queryClient.invalidateQueries({ queryKey: ["quotes", props.userId] });
+      queryClient.invalidateQueries({ queryKey: ["my-quote-requests", props.userId] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
