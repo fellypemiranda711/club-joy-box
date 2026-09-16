@@ -404,3 +404,91 @@ function PedidosPage() {
     </AdminPage>
   );
 }
+
+type MeasurementRow = {
+  id: string;
+  pd_mm: number | null;
+  dnp_right_mm: number | null;
+  dnp_left_mm: number | null;
+  height_right_mm: number | null;
+  height_left_mm: number | null;
+};
+
+function ManualMeasurementsForm({
+  quoteId,
+  userId,
+  measurement,
+  saving,
+  onSave,
+}: {
+  quoteId: string;
+  userId: string;
+  measurement: MeasurementRow | null;
+  saving: boolean;
+  onSave: (values: {
+    pd_mm: number | null;
+    dnp_right_mm: number | null;
+    dnp_left_mm: number | null;
+    height_right_mm: number | null;
+    height_left_mm: number | null;
+  }) => void;
+}) {
+  void quoteId;
+  void userId;
+  const toStr = (v: number | null | undefined) => (v == null ? "" : String(v));
+  const [pd, setPd] = useState(() => toStr(measurement?.pd_mm));
+  const [dnpR, setDnpR] = useState(() => toStr(measurement?.dnp_right_mm));
+  const [dnpL, setDnpL] = useState(() => toStr(measurement?.dnp_left_mm));
+  const [hR, setHR] = useState(() => toStr(measurement?.height_right_mm));
+  const [hL, setHL] = useState(() => toStr(measurement?.height_left_mm));
+
+  const parse = (s: string): number | null => {
+    const n = Number(s.replace(",", "."));
+    return s.trim() === "" || !Number.isFinite(n) ? null : n;
+  };
+
+  const fields: Array<[string, string, (v: string) => void]> = [
+    ["DP (mm)", pd, setPd],
+    ["DNP direita (mm)", dnpR, setDnpR],
+    ["DNP esquerda (mm)", dnpL, setDnpL],
+    ["Altura direita (mm)", hR, setHR],
+    ["Altura esquerda (mm)", hL, setHL],
+  ];
+
+  return (
+    <div className="rounded-lg border border-border p-3">
+      <p className="text-xs font-medium text-foreground">Preencher medidas manualmente</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-5">
+        {fields.map(([label, value, setValue]) => (
+          <label key={label} className="grid gap-1 text-xs text-muted-foreground">
+            {label}
+            <input
+              type="text"
+              inputMode="decimal"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+              placeholder="0,0"
+            />
+          </label>
+        ))}
+      </div>
+      <Button
+        size="sm"
+        className="mt-2"
+        disabled={saving}
+        onClick={() =>
+          onSave({
+            pd_mm: parse(pd),
+            dnp_right_mm: parse(dnpR),
+            dnp_left_mm: parse(dnpL),
+            height_right_mm: parse(hR),
+            height_left_mm: parse(hL),
+          })
+        }
+      >
+        Salvar medidas
+      </Button>
+    </div>
+  );
+}
