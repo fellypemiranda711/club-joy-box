@@ -210,16 +210,29 @@ function PedidosPage() {
                         {measurementStatusLabels[m.status] ?? m.status}
                       </span>
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura {m.height_right_mm}/
-                      {m.height_left_mm} mm
-                      {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
-                    </p>
+                    {m.pd_mm != null ? (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        DP {m.pd_mm} mm · DNP {m.dnp_right_mm}/{m.dnp_left_mm} mm · Altura {m.height_right_mm}/
+                        {m.height_left_mm} mm
+                        {m.pantoscopic_angle_deg != null && ` · Pantoscópico ${m.pantoscopic_angle_deg}°`}
+                      </p>
+                    ) : (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Medidas ainda não enviadas por foto.
+                      </p>
+                    )}
                     {m.admin_notes && <p className="mt-1 text-xs text-muted-foreground">Nota: {m.admin_notes}</p>}
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
-                        Ver foto frontal
-                      </Button>
+                      {m.frame_photo_path && (
+                        <Button size="sm" variant="outline" onClick={() => openPhoto(m.frame_photo_path)}>
+                          Ver armação no rosto
+                        </Button>
+                      )}
+                      {m.front_photo_path && (
+                        <Button size="sm" variant="outline" onClick={() => openPhoto(m.front_photo_path)}>
+                          Ver foto frontal
+                        </Button>
+                      )}
                       {m.profile_photo_path && (
                         <Button size="sm" variant="outline" onClick={() => openPhoto(m.profile_photo_path)}>
                           Ver foto de perfil

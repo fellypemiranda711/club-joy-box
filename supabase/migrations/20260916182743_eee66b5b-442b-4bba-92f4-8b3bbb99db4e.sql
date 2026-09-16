@@ -1,0 +1,1 @@
+ALTER TABLE public.quote_measurements ADD COLUMN IF NOT EXISTS frame_photo_path text;
