@@ -148,6 +148,29 @@ function OrcamentosPage() {
     },
   });
 
+  // Volta do checkout do Stripe: confirma o pagamento e atualiza a lista.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("quote_session");
+    if (!sessionId || sessionId.includes("{")) return;
+    window.history.replaceState({}, "", window.location.pathname);
+    (async () => {
+      const result = await confirmQuotePayment({
+        data: { sessionId, environment: getStripeEnvironment() },
+      });
+      if ("error" in result) {
+        toast.error(result.error);
+        return;
+      }
+      if (result.paid) {
+        toast.success("Pagamento confirmado! Agora você pode enviar as medidas por foto.");
+        queryClient.invalidateQueries({ queryKey: ["my-quote-requests", user?.id] });
+      }
+    })();
+  }, [queryClient, user?.id]);
+
+
+
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Sessão expirada. Entre novamente.");
