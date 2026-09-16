@@ -171,6 +171,7 @@ export type Database = {
           created_at: string
           dnp_left_mm: number | null
           dnp_right_mm: number | null
+          frame_photo_path: string | null
           front_photo_path: string | null
           height_left_mm: number | null
           height_right_mm: number | null
@@ -192,6 +193,7 @@ export type Database = {
           created_at?: string
           dnp_left_mm?: number | null
           dnp_right_mm?: number | null
+          frame_photo_path?: string | null
           front_photo_path?: string | null
           height_left_mm?: number | null
           height_right_mm?: number | null
@@ -213,6 +215,7 @@ export type Database = {
           created_at?: string
           dnp_left_mm?: number | null
           dnp_right_mm?: number | null
+          frame_photo_path?: string | null
           front_photo_path?: string | null
           height_left_mm?: number | null
           height_right_mm?: number | null
