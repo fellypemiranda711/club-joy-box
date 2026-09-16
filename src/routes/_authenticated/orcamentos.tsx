@@ -32,12 +32,17 @@ export const Route = createFileRoute("/_authenticated/orcamentos")({
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Em análise",
+  received: "Em análise",
+  quoting: "Em cotação",
   quoted: "Orçamento enviado",
   approved: "Aprovado",
   paid: "Pago",
   completed: "Concluído",
+  canceled: "Cancelado",
   cancelled: "Cancelado",
 };
+
+const CAN_CHOOSE_STATUSES = ["received", "quoting", "quoted"];
 
 const LENS_OPTIONS = [
   {
