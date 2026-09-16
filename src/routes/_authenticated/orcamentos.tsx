@@ -568,6 +568,11 @@ function OrcamentosPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     {new Date(req.created_at).toLocaleDateString("pt-BR")}
                   </p>
+                  <QuoteOptionsPicker
+                    quoteId={req.id}
+                    userId={user?.id}
+                    canChoose={CAN_CHOOSE_STATUSES.includes(req.status)}
+                  />
                 </div>
               ))
             )}
