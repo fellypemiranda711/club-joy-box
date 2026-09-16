@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, FileText, Image as ImageIcon, Loader2, SendHorizonal, Upload, X } from "lucide-react";
 import { MemberShell } from "@/components/member/MemberShell";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
+import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
+import { confirmQuotePayment } from "@/utils/quote-payment.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,13 +138,38 @@ function OrcamentosPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("quote_requests")
-        .select("id, patient_name, lens_type, status, payment_status, created_at")
+        .select(
+          "id, patient_name, lens_type, status, payment_status, quoted_amount_cents, created_at",
+        )
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
+
+  // Volta do checkout do Stripe: confirma o pagamento e atualiza a lista.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("quote_session");
+    if (!sessionId || sessionId.includes("{")) return;
+    window.history.replaceState({}, "", window.location.pathname);
+    (async () => {
+      const result = await confirmQuotePayment({
+        data: { sessionId, environment: getStripeEnvironment() },
+      });
+      if ("error" in result) {
+        toast.error(result.error);
+        return;
+      }
+      if (result.paid) {
+        toast.success("Pagamento confirmado! Agora você pode enviar as medidas por foto.");
+        queryClient.invalidateQueries({ queryKey: ["my-quote-requests", user?.id] });
+      }
+    })();
+  }, [queryClient, user?.id]);
+
+
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -574,6 +602,14 @@ function OrcamentosPage() {
                     userId={user?.id}
                     canChoose={CAN_CHOOSE_STATUSES.includes(req.status)}
                   />
+                  {req.status === "approved" && req.payment_status !== "paid" && (
+                    <QuotePaymentPanel quoteId={req.id} amountCents={req.quoted_amount_cents} />
+                  )}
+                  {req.payment_status === "paid" && (
+                    <p className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
+                      Pagamento confirmado. A tomada de medidas por foto já está liberada.
+                    </p>
+                  )}
                 </div>
               ))
             )}
