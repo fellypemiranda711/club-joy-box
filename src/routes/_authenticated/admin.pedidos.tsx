@@ -181,7 +181,11 @@ function PedidosPage() {
             <div key={q.id} className="rounded-xl border border-border p-4 text-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
+                  <span className="mb-1 inline-block rounded-md bg-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-primary">
+                    {(q as { os_number?: string | null }).os_number ?? "OS —"}
+                  </span>
                   <p className="font-medium">{q.patient_name}</p>
+
                   <p className="text-muted-foreground">
                     {q.lens_type || "—"} · {quoteStatusLabels[q.status] ?? q.status} ·{" "}
                     {new Date(q.created_at).toLocaleDateString("pt-BR")}
