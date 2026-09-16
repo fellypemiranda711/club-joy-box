@@ -267,6 +267,20 @@ function PedidosPage() {
 
               <div className="mt-3 space-y-3">
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Medidas</p>
+                <ManualMeasurementsForm
+                  quoteId={q.id}
+                  userId={q.user_id}
+                  measurement={quoteMeasurements[0] ?? null}
+                  saving={saveMeasurements.isPending}
+                  onSave={(values) =>
+                    saveMeasurements.mutate({
+                      quoteId: q.id,
+                      userId: q.user_id,
+                      measurementId: quoteMeasurements[0]?.id ?? null,
+                      values,
+                    })
+                  }
+                />
                 {quoteMeasurements.length === 0 && (
                   <p className="text-xs text-muted-foreground">Nenhuma medida enviada por foto ainda.</p>
                 )}
