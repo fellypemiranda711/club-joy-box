@@ -6,6 +6,8 @@ import { MemberShell } from "@/components/member/MemberShell";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
 import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
 import { confirmQuotePayment } from "@/utils/quote-payment.functions";
+import { FramePhotoPanel } from "@/components/member/FramePhotoPanel";
+import { MeasurementDialog } from "@/components/member/MeasurementDialog";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
