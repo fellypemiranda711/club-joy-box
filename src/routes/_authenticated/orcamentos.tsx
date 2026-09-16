@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, FileText, Image as ImageIcon, Loader2, SendHorizonal, Upload, X } from "lucide-react";
 import { MemberShell } from "@/components/member/MemberShell";
 import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
+import { QuotePaymentPanel } from "@/components/member/QuotePaymentPanel";
+import { confirmQuotePayment } from "@/utils/quote-payment.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
