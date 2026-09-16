@@ -371,6 +371,7 @@ export type Database = {
           lab_id: string | null
           lens_type: string | null
           notes: string | null
+          os_number: string
           paid_at: string | null
           patient_name: string
           payment_status: string
@@ -394,6 +395,7 @@ export type Database = {
           lab_id?: string | null
           lens_type?: string | null
           notes?: string | null
+          os_number?: string
           paid_at?: string | null
           patient_name: string
           payment_status?: string
@@ -417,6 +419,7 @@ export type Database = {
           lab_id?: string | null
           lens_type?: string | null
           notes?: string | null
+          os_number?: string
           paid_at?: string | null
           patient_name?: string
           payment_status?: string
