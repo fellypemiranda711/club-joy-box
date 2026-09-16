@@ -108,6 +108,46 @@ function PedidosPage() {
     onError: () => toast.error("Não foi possível atualizar as medidas."),
   });
 
+  const saveMeasurements = useMutation({
+    mutationFn: async ({
+      quoteId,
+      measurementId,
+      userId,
+      values,
+    }: {
+      quoteId: string;
+      measurementId: string | null;
+      userId: string;
+      values: {
+        pd_mm: number | null;
+        dnp_right_mm: number | null;
+        dnp_left_mm: number | null;
+        height_right_mm: number | null;
+        height_left_mm: number | null;
+      };
+    }) => {
+      if (measurementId) {
+        const { error } = await supabase
+          .from("quote_measurements")
+          .update(values)
+          .eq("id", measurementId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("quote_measurements").insert({
+          quote_id: quoteId,
+          user_id: userId,
+          ...values,
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Medidas salvas.");
+      queryClient.invalidateQueries({ queryKey: ["admin-measurements"] });
+    },
+    onError: () => toast.error("Não foi possível salvar as medidas."),
+  });
+
   async function openPhoto(path: string | null) {
     if (!path) return;
     const { data, error } = await supabase.storage.from("measurements").createSignedUrl(path, 300);
@@ -227,6 +267,20 @@ function PedidosPage() {
 
               <div className="mt-3 space-y-3">
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Medidas</p>
+                <ManualMeasurementsForm
+                  quoteId={q.id}
+                  userId={q.user_id}
+                  measurement={quoteMeasurements[0] ?? null}
+                  saving={saveMeasurements.isPending}
+                  onSave={(values) =>
+                    saveMeasurements.mutate({
+                      quoteId: q.id,
+                      userId: q.user_id,
+                      measurementId: quoteMeasurements[0]?.id ?? null,
+                      values,
+                    })
+                  }
+                />
                 {quoteMeasurements.length === 0 && (
                   <p className="text-xs text-muted-foreground">Nenhuma medida enviada por foto ainda.</p>
                 )}
@@ -348,5 +402,93 @@ function PedidosPage() {
       </section>
 
     </AdminPage>
+  );
+}
+
+type MeasurementRow = {
+  id: string;
+  pd_mm: number | null;
+  dnp_right_mm: number | null;
+  dnp_left_mm: number | null;
+  height_right_mm: number | null;
+  height_left_mm: number | null;
+};
+
+function ManualMeasurementsForm({
+  quoteId,
+  userId,
+  measurement,
+  saving,
+  onSave,
+}: {
+  quoteId: string;
+  userId: string;
+  measurement: MeasurementRow | null;
+  saving: boolean;
+  onSave: (values: {
+    pd_mm: number | null;
+    dnp_right_mm: number | null;
+    dnp_left_mm: number | null;
+    height_right_mm: number | null;
+    height_left_mm: number | null;
+  }) => void;
+}) {
+  void quoteId;
+  void userId;
+  const toStr = (v: number | null | undefined) => (v == null ? "" : String(v));
+  const [pd, setPd] = useState(() => toStr(measurement?.pd_mm));
+  const [dnpR, setDnpR] = useState(() => toStr(measurement?.dnp_right_mm));
+  const [dnpL, setDnpL] = useState(() => toStr(measurement?.dnp_left_mm));
+  const [hR, setHR] = useState(() => toStr(measurement?.height_right_mm));
+  const [hL, setHL] = useState(() => toStr(measurement?.height_left_mm));
+
+  const parse = (s: string): number | null => {
+    const n = Number(s.replace(",", "."));
+    return s.trim() === "" || !Number.isFinite(n) ? null : n;
+  };
+
+  const fields: Array<[string, string, (v: string) => void]> = [
+    ["DP (mm)", pd, setPd],
+    ["DNP direita (mm)", dnpR, setDnpR],
+    ["DNP esquerda (mm)", dnpL, setDnpL],
+    ["Altura direita (mm)", hR, setHR],
+    ["Altura esquerda (mm)", hL, setHL],
+  ];
+
+  return (
+    <div className="rounded-lg border border-border p-3">
+      <p className="text-xs font-medium text-foreground">Preencher medidas manualmente</p>
+      <div className="mt-2 grid gap-2 sm:grid-cols-5">
+        {fields.map(([label, value, setValue]) => (
+          <label key={label} className="grid gap-1 text-xs text-muted-foreground">
+            {label}
+            <input
+              type="text"
+              inputMode="decimal"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+              placeholder="0,0"
+            />
+          </label>
+        ))}
+      </div>
+      <Button
+        size="sm"
+        className="mt-2"
+        disabled={saving}
+        onClick={() =>
+          onSave({
+            pd_mm: parse(pd),
+            dnp_right_mm: parse(dnpR),
+            dnp_left_mm: parse(dnpL),
+            height_right_mm: parse(hR),
+            height_left_mm: parse(hL),
+          })
+        }
+      >
+        Salvar medidas
+      </Button>
+    </div>
   );
 }
