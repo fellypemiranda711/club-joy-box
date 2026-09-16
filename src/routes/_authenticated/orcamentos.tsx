@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, FileText, Image as ImageIcon, Loader2, SendHorizonal, Upload, X } from "lucide-react";
 import { MemberShell } from "@/components/member/MemberShell";
+import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
