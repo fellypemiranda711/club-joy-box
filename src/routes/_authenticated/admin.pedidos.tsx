@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminPage, Empty } from "@/components/admin/AdminShell";
@@ -33,6 +33,19 @@ function PedidosPage() {
   const measurements = useAdminMeasurements(isAdmin);
   const queryClient = useQueryClient();
   const [lensByQuote, setLensByQuote] = useState<Record<string, string>>({});
+
+  const chosenOptions = useQuery({
+    queryKey: ["admin-chosen-options"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("quote_options")
+        .select("id, quote_id, tier, title, description, member_price_cents, market_price_cents")
+        .eq("selected", true);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const setQuoteStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
