@@ -183,6 +183,22 @@ function PedidosPage() {
                 </div>
               </div>
 
+              {chosenOption && (
+                <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-xs">
+                  <p className="font-medium text-foreground">
+                    Lente escolhida pelo associado: {chosenOption.title}
+                  </p>
+                  <p className="text-muted-foreground">
+                    Valor pago: {brl(chosenOption.member_price_cents)}
+                    {chosenOption.market_price_cents > 0 &&
+                      ` · média das óticas ${brl(chosenOption.market_price_cents)}`}
+                  </p>
+                  {chosenOption.description && (
+                    <p className="text-muted-foreground">{chosenOption.description}</p>
+                  )}
+                </div>
+              )}
+
               {selectedLens && (
                 <p className="mt-3 rounded-lg bg-secondary px-3 py-2 text-xs text-muted-foreground">
                   {selectedLens.name}
