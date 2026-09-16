@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock, FileText, Image as ImageIcon, Loader2, SendHorizonal, Upload, X } from "lucide-react";
 import { MemberShell } from "@/components/member/MemberShell";
+import { QuoteOptionsPicker } from "@/components/member/QuoteOptionsPicker";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,12 +33,17 @@ export const Route = createFileRoute("/_authenticated/orcamentos")({
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Em análise",
+  received: "Em análise",
+  quoting: "Em cotação",
   quoted: "Orçamento enviado",
   approved: "Aprovado",
   paid: "Pago",
   completed: "Concluído",
+  canceled: "Cancelado",
   cancelled: "Cancelado",
 };
+
+const CAN_CHOOSE_STATUSES = ["received", "quoting", "quoted"];
 
 const LENS_OPTIONS = [
   {
@@ -563,6 +569,11 @@ function OrcamentosPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     {new Date(req.created_at).toLocaleDateString("pt-BR")}
                   </p>
+                  <QuoteOptionsPicker
+                    quoteId={req.id}
+                    userId={user?.id}
+                    canChoose={CAN_CHOOSE_STATUSES.includes(req.status)}
+                  />
                 </div>
               ))
             )}

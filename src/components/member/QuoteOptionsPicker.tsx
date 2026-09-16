@@ -6,7 +6,11 @@ import { formatBRL } from "@/lib/whatsapp";
 import { savingsCents, savingsPercent, tierMeta } from "@/lib/quote-options";
 import { VisionFieldPreview } from "@/components/VisionFieldPreview";
 
-export function QuoteOptionsPicker(props: { quoteId: string; canChoose: boolean; userId?: string }) {
+export function QuoteOptionsPicker(props: {
+  quoteId: string;
+  canChoose: boolean;
+  userId?: string | undefined;
+}) {
   const queryClient = useQueryClient();
 
   const options = useQuery({
@@ -31,6 +35,7 @@ export function QuoteOptionsPicker(props: { quoteId: string; canChoose: boolean;
       toast.success("Opção escolhida! Agora envie as medidas por foto.");
       queryClient.invalidateQueries({ queryKey: ["member-quote-options", props.quoteId] });
       queryClient.invalidateQueries({ queryKey: ["quotes", props.userId] });
+      queryClient.invalidateQueries({ queryKey: ["my-quote-requests", props.userId] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
