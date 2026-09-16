@@ -134,6 +134,7 @@ function PedidosPage() {
             (p) => p.active && (!q.lab_id || p.lab_id === q.lab_id),
           );
           const selectedLens = labProducts.find((p) => p.id === lensByQuote[q.id]);
+          const chosenOption = chosenOptions.data?.find((o) => o.quote_id === q.id);
           const quoteMeasurements = (measurements.data ?? []).filter((m) => m.quote_id === q.id);
 
           return (
