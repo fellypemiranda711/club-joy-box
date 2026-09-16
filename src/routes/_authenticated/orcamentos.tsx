@@ -605,10 +605,21 @@ function OrcamentosPage() {
                   {req.status === "approved" && req.payment_status !== "paid" && (
                     <QuotePaymentPanel quoteId={req.id} amountCents={req.quoted_amount_cents} />
                   )}
-                  {req.payment_status === "paid" && (
-                    <p className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
-                      Pagamento confirmado. A tomada de medidas por foto já está liberada.
-                    </p>
+                  {req.payment_status === "paid" && user && (
+                    <>
+                      <p className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
+                        Pagamento confirmado. Envie a foto com a armação no rosto e faça a tomada de
+                        medidas.
+                      </p>
+                      <FramePhotoPanel quoteId={req.id} userId={user.id} />
+                      <div className="mt-3">
+                        <MeasurementDialog
+                          quoteId={req.id}
+                          userId={user.id}
+                          patientName={req.patient_name}
+                        />
+                      </div>
+                    </>
                   )}
                 </div>
               ))
