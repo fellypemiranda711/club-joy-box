@@ -25,6 +25,7 @@ import { Route as AuthenticatedAssinarRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedSolicitacoesRouteImport } from './routes/_authenticated/solicitacoes'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAssinaturasRouteImport } from './routes/_authenticated/admin.assinaturas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
@@ -119,6 +120,12 @@ const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSolicitacoesRoute =
+  AuthenticatedSolicitacoesRouteImport.update({
+    id: '/solicitacoes',
+    path: '/solicitacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -218,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/lab': typeof AuthenticatedLabRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/solicitacoes': typeof AuthenticatedSolicitacoesRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
@@ -248,6 +256,7 @@ export interface FileRoutesByTo {
   '/lab': typeof AuthenticatedLabRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/solicitacoes': typeof AuthenticatedSolicitacoesRoute
   '/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
@@ -281,6 +290,7 @@ export interface FileRoutesById {
   '/_authenticated/lab': typeof AuthenticatedLabRoute
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/solicitacoes': typeof AuthenticatedSolicitacoesRoute
   '/_authenticated/admin/assinaturas': typeof AuthenticatedAdminAssinaturasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/comissoes': typeof AuthenticatedAdminComissoesRoute
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/lab'
     | '/orcamentos'
     | '/perfil'
+    | '/solicitacoes'
     | '/admin/assinaturas'
     | '/admin/clientes'
     | '/admin/comissoes'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/lab'
     | '/orcamentos'
     | '/perfil'
+    | '/solicitacoes'
     | '/admin/assinaturas'
     | '/admin/clientes'
     | '/admin/comissoes'
@@ -376,6 +388,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lab'
     | '/_authenticated/orcamentos'
     | '/_authenticated/perfil'
+    | '/_authenticated/solicitacoes'
     | '/_authenticated/admin/assinaturas'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/comissoes'
@@ -518,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/perfil'
       fullPath: '/perfil'
       preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/solicitacoes': {
+      id: '/_authenticated/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/solicitacoes'
+      preLoaderRoute: typeof AuthenticatedSolicitacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -663,6 +683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLabRoute: typeof AuthenticatedLabRoute
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedSolicitacoesRoute: typeof AuthenticatedSolicitacoesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -672,6 +693,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLabRoute: AuthenticatedLabRoute,
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedSolicitacoesRoute: AuthenticatedSolicitacoesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
