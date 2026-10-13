@@ -15,7 +15,7 @@ export function QuotePaymentPanel({
   const [open, setOpen] = useState(false);
 
   const fetchClientSecret = async (): Promise<string> => {
-    const returnUrl = `${window.location.origin}/orcamentos?quote_session={CHECKOUT_SESSION_ID}`;
+    const returnUrl = `${window.location.origin}/solicitacoes?quote_session={CHECKOUT_SESSION_ID}`;
     const result = await createQuotePaymentCheckout({
       data: { quoteId, returnUrl, environment: getStripeEnvironment() },
     });

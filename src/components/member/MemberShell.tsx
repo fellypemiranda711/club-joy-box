@@ -8,6 +8,7 @@ const items = [
   { to: "/area", label: "Painel" },
   { to: "/perfil", label: "Meus dados" },
   { to: "/orcamentos", label: "Orçamentos" },
+  { to: "/solicitacoes", label: "Solicitações" },
 ] as const;
 
 export function MemberNav() {
